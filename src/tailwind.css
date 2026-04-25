@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* 1. RESET STYLES (Berlaku untuk semua halaman) */
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    appearance: none;
+    background-color: transparent;
+    border-width: 0;
+    outline: none;
+  }
+}
+
+/* 2. CUSTOM CLASSES */
+@layer components {
+  .all-\[unset\] {
+    all: unset;
+  }
+}
+
+/* 3. VARIABLES & FONT */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+:root {
+  --animate-spin: spin 1s linear infinite;
+  --font-poppins: "Poppins", sans-serif;
+}
+
+body {
+  font-family: var(--font-poppins);
+}
+
+/* 4. ANIMASI (Untuk Home & Login) */
+.animate-fade-in {
+  animation: fade-in 1s var(--animation-delay, 0s) ease forwards;
+}
+.animate-fade-up {
+  animation: fade-up 1s var(--animation-delay, 0s) ease forwards;
+}
+.animate-marquee {
+  animation: marquee var(--duration) infinite linear;
+}
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration) linear infinite;
+}
+.animate-shimmer {
+  animation: shimmer 8s infinite;
+}
+.animate-spin {
+  animation: var(--animate-spin);
+}
+
+/* 5. KEYFRAMES (Logika Gerakan) */
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes image-glow {
+  0% {
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.74, 0.25, 0.76, 1);
+  }
+  10% {
+    opacity: 0.7;
+    animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
+  }
+  to {
+    opacity: 0.4;
+  }
+}
+@keyframes shimmer {
+  0%,
+  90%,
+  to {
+    background-position: calc(-100% - var(--shimmer-width)) 0;
+  }
+  30%,
+  60% {
+    background-position: calc(100% + var(--shimmer-width)) 0;
+  }
+}
+@keyframes marquee {
+  0% {
+    transform: translate(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
