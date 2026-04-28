@@ -6,6 +6,8 @@ import Register from "./pages/Register"; // Sudah diperbaiki namanya
 import Profil from "./pages/admin/Profil";
 import Pesan from "./pages/admin/Pesan";
 import EditProfil from "./pages/admin/EditProfil";
+import GantiPassword from "./pages/admin/GantiPassword";
+import Pengaturan from "./pages/admin/Pengaturan";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/profil" element={<Profil />} />
         <Route path="/pesan" element={<Pesan />} />
         <Route path="/edit-profil" element={<EditProfil />} />
+        <Route path="/ganti-password" element={<GantiPassword />} />
+        <Route path="/pengaturan" element={<Pengaturan />} />
       </Routes>
     </Router>
   );

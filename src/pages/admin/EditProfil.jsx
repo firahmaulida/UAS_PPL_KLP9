@@ -15,7 +15,9 @@ const EditProfil = () => {
     name: "Klp 09 PPL",
     email: "admin@email.com",
     phone: "08123456789",
-    store: "Toko Food Waste",
+    store: "Green Grocery",
+    address: "Jl. Sustainability No. 42",
+    desc: "Dedicated to reducing food waste and improving sustainability.",
   });
 
   const [avatar, setAvatar] = useState(userAvatar);
@@ -29,128 +31,163 @@ const EditProfil = () => {
     if (file) setAvatar(URL.createObjectURL(file));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert("Profil berhasil diupdate 🚀");
+  const handleSave = () => {
+    alert("Profil berhasil disimpan 🚀");
     console.log(profile);
   };
 
-  const field =
-    "w-full h-14 flex items-center gap-3 px-5 rounded-2xl bg-[#63714ecc] text-white";
-
-  const input =
-    "flex-1 bg-transparent outline-none text-white placeholder-white text-sm";
-
   return (
-    <div className="flex w-full h-screen bg-[#effae8]">
+    <div className="flex min-h-screen bg-[#effae8]">
 
       {/* SIDEBAR */}
-      <div className="p-4">
-        <SideBar activePage="profil" />
-      </div>
+      <SideBar activePage="profil" />
 
-      {/* CONTENT */}
-      <main className="flex-1 flex items-center justify-center">
+      {/* MAIN CONTENT */}
+      <main className="flex-1 p-6">
 
-        <section className="w-[500px] bg-white/80 backdrop-blur-md rounded-3xl shadow-lg p-8">
-
-          {/* HEADER */}
-          <div className="flex justify-between items-center mb-6">
-
-            <h1 className="text-2xl font-bold text-[#63714e]">
-              Edit Profil
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-[#455538]">
+              Edit Profil Admin
             </h1>
+            <p className="text-sm text-gray-600">
+              Manage your profile and business information
+            </p>
+          </div>
 
-            {/* BACK BUTTON */}
+          <div className="flex gap-3">
             <button
               onClick={() => navigate("/profil")}
-              className="text-sm text-[#63714e] hover:text-[#4f5c3d] font-medium"
+              className="px-4 py-2 rounded-full border text-[#455538]"
             >
               ← Kembali
             </button>
 
-          </div>
-
-          {/* AVATAR */}
-          <div className="flex flex-col items-center mb-6">
-            <img
-              src={avatar}
-              className="w-24 h-24 rounded-full object-cover border-4 border-[#63714e]"
-              alt="profile"
-            />
-
-            <label className="text-sm text-blue-600 mt-2 cursor-pointer">
-              Ganti Foto
-              <input type="file" hidden onChange={handleImage} />
-            </label>
-          </div>
-
-          {/* FORM */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
-            {/* NAME */}
-            <div className={field}>
-              <img src={peopleImg} className="w-5 h-5" />
-              <input
-                name="name"
-                value={profile.name}
-                onChange={handleChange}
-                className={input}
-                placeholder="Nama"
-              />
-            </div>
-
-            {/* EMAIL */}
-            <div className={field}>
-              <img src={emailImg} className="w-5 h-5" />
-              <input
-                name="email"
-                value={profile.email}
-                onChange={handleChange}
-                className={input}
-                placeholder="Email"
-              />
-            </div>
-
-            {/* PHONE */}
-            <div className={field}>
-              <img src={phoneImg} className="w-5 h-5" />
-              <input
-                name="phone"
-                value={profile.phone}
-                onChange={handleChange}
-                className={input}
-                placeholder="No HP"
-              />
-            </div>
-
-            {/* STORE */}
-            <div className={field}>
-              <img src={tokoImg} className="w-5 h-5" />
-              <input
-                name="store"
-                value={profile.store}
-                onChange={handleChange}
-                className={input}
-                placeholder="Nama Toko"
-              />
-            </div>
-
-            {/* BUTTON */}
             <button
-              type="submit"
-              className="bg-[#F8BC22] hover:bg-yellow-500 text-white py-3 rounded-2xl font-semibold transition"
+              onClick={handleSave}
+              className="px-6 py-2 rounded-full bg-[#F8BC22] text-white font-semibold"
             >
-              Simpan Perubahan
+              Simpan
             </button>
+          </div>
+        </div>
 
-          </form>
+        {/* GRID */}
+        <div className="grid lg:grid-cols-3 gap-6">
 
-        </section>
+          {/* LEFT FORM */}
+          <section className="lg:col-span-2 space-y-6">
+
+            {/* PROFILE CARD */}
+            <div className="bg-white/80 rounded-3xl p-6 shadow">
+
+              <h2 className="font-bold text-[#455538] mb-4">
+                Informasi Akun
+              </h2>
+
+              {/* AVATAR */}
+              <div className="flex items-center gap-4 mb-6">
+                <img
+                  src={avatar}
+                  className="w-24 h-24 rounded-2xl border-4 border-white shadow"
+                />
+
+                <label className="text-blue-600 text-sm cursor-pointer">
+                  Ganti Foto
+                  <input type="file" hidden onChange={handleImage} />
+                </label>
+              </div>
+
+              {/* INPUT GRID */}
+              <div className="grid md:grid-cols-2 gap-4">
+
+                <Input icon={peopleImg} name="name" value={profile.name} onChange={handleChange} placeholder="Nama" />
+                <Input icon={emailImg} name="email" value={profile.email} onChange={handleChange} placeholder="Email" />
+                <Input icon={phoneImg} name="phone" value={profile.phone} onChange={handleChange} placeholder="No HP" />
+
+              </div>
+            </div>
+
+            {/* BUSINESS CARD */}
+            <div className="bg-white/80 rounded-3xl p-6 shadow">
+
+              <h2 className="font-bold text-[#455538] mb-4">
+                Informasi Bisnis
+              </h2>
+
+              <div className="space-y-4">
+
+                <Input icon={tokoImg} name="store" value={profile.store} onChange={handleChange} placeholder="Nama Toko" />
+
+                <Input icon={tokoImg} name="address" value={profile.address} onChange={handleChange} placeholder="Alamat Toko" />
+
+                <textarea
+                  name="desc"
+                  value={profile.desc}
+                  onChange={handleChange}
+                  rows="4"
+                  className="w-full p-4 rounded-2xl bg-[#63714ecc] text-white outline-none"
+                  placeholder="Deskripsi bisnis"
+                />
+
+              </div>
+            </div>
+
+          </section>
+
+          {/* RIGHT PREVIEW */}
+          <aside className="bg-white/80 rounded-3xl p-6 shadow h-fit">
+
+            <h2 className="font-bold text-[#455538] mb-4">
+              Live Preview
+            </h2>
+
+            <div className="text-center">
+
+              <img
+                src={avatar}
+                className="w-20 h-20 mx-auto rounded-full border mb-3"
+              />
+
+              <h3 className="font-bold text-[#455538]">
+                {profile.name}
+              </h3>
+
+              <p className="text-sm text-gray-600">
+                {profile.email}
+              </p>
+
+              <div className="mt-4 text-xs text-gray-500 space-y-1">
+                <p>🏪 {profile.store}</p>
+                <p>📍 {profile.address}</p>
+                <p>📞 {profile.phone}</p>
+              </div>
+
+            </div>
+
+            <div className="mt-6 p-3 bg-[#eef26b]/40 rounded-xl text-xs text-[#455538]">
+              Live preview update otomatis saat kamu edit form
+            </div>
+
+          </aside>
+
+        </div>
 
       </main>
     </div>
   );
 };
+
+/* INPUT COMPONENT */
+const Input = ({ icon, ...props }) => (
+  <div className="flex items-center gap-3 bg-[#63714ecc] text-white p-4 rounded-2xl">
+    <img src={icon} className="w-5 h-5" />
+    <input
+      {...props}
+      className="bg-transparent w-full outline-none text-white"
+    />
+  </div>
+);
 
 export default EditProfil;
