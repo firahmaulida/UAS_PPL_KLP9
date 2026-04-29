@@ -30,8 +30,11 @@ export const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    // Logika gabungan: Jika admin ke dashboard admin, jika tidak ke dashboard biasa
     if (role === "admin") {
       navigate("/admin/dashboard");
+    } else {
+      navigate("/dashboard");
     }
   };
 

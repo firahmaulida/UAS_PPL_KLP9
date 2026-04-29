@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, ShoppingBag, MessageCircle, User } from "lucide-react";
+import {
+  LayoutDashboard,
+  Home,
+  ShoppingBag,
+  MessageCircle,
+  User,
+} from "lucide-react";
 import userAvatar from "../assets/Rectangle.png";
 
 const SideBar = ({ activePage }) => {
@@ -8,7 +14,12 @@ const SideBar = ({ activePage }) => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { id: "home", icon: Home, label: "Dashboard", route: "/" },
+    {
+      id: "dashboard",
+      icon: LayoutDashboard,
+      label: "Dashboard",
+      route: "/dashboard",
+    },
     { id: "menu", icon: ShoppingBag, label: "List Menu", route: "/menu" },
     { id: "pesan", icon: MessageCircle, label: "Pesan", route: "/pesan" },
     { id: "profil", icon: User, label: "Profil", route: "/profil" },
@@ -22,10 +33,12 @@ const SideBar = ({ activePage }) => {
         isHovered ? "w-60 px-3" : "w-20 px-0"
       }`}
     >
-      {/* USER MINI */}
+      {/* USER */}
       <div
         className={`flex items-center mt-10 mb-12 transition-all duration-300 ${
-          isHovered ? "bg-[#f8bc22] rounded-full py-2.5 px-4 mx-2" : "justify-center"
+          isHovered
+            ? "bg-[#f8bc22] rounded-full py-2.5 px-4 mx-2"
+            : "justify-center"
         }`}
       >
         <img
@@ -62,7 +75,6 @@ const SideBar = ({ activePage }) => {
                 <Icon
                   size={24}
                   className={isActive ? "text-[#63714e]" : "text-white"}
-                  strokeWidth={2.5}
                 />
               </div>
 
