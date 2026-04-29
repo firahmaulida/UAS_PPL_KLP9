@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import groceryImage from "../../assets/image.png";
 import "./css admin/dashboard-admin.css";
 
@@ -180,10 +181,10 @@ function AlertIcon() {
 
 function Sidebar() {
   const navItems = [
-    { id: "home", label: "Dashboard", icon: <HomeIcon />, active: true },
-    { id: "menu", label: "Menu", icon: <MenuIcon /> },
-    { id: "messages", label: "Messages", icon: <MessageIcon /> },
-    { id: "profile", label: "Profile", icon: <UserIcon /> },
+    { id: "home", label: "Dashboard", icon: <HomeIcon />, to: "/admin/dashboard", active: true },
+    { id: "menu", label: "Menu", icon: <MenuIcon />, to: "/admin/list-menu" },
+    { id: "messages", label: "Messages", icon: <MessageIcon />, to: "/admin/messages" },
+    { id: "profile", label: "Profile", icon: <UserIcon />, to: "/admin/profile" },
   ];
 
   return (
@@ -194,14 +195,14 @@ function Sidebar() {
 
       <nav className="sidebar-nav">
         {navItems.map((item) => (
-          <button
+          <Link
             className={`sidebar-link ${item.active ? "active" : ""}`}
+            to={item.to}
             key={item.id}
-            type="button"
             aria-label={item.label}
           >
             {item.icon}
-          </button>
+          </Link>
         ))}
       </nav>
     </aside>
@@ -329,9 +330,9 @@ export function DashboardAdmin() {
               <h1>Welcome , Admin!</h1>
               <p>Monitor and reduce food waste today.</p>
             </div>
-            <button className="primary-button" type="button">
+            <Link className="primary-button" to="/admin/list-menu">
               View Expiring Menu
-            </button>
+            </Link>
           </div>
 
           <div className="stats-row">

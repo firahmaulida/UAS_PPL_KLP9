@@ -1,9 +1,10 @@
 .dashboard-admin {
-  --page-width: min(1440px, calc(100vw - 72px));
+  --page-width: min(1250px, calc(100vw - 32px));
   --shadow: 8px 14px 18px rgba(72, 78, 52, 0.3);
 
   min-height: 100vh;
   position: relative;
+  isolation: isolate;
   overflow-x: hidden;
   overflow-y: auto;
   color: #111111;
@@ -16,13 +17,13 @@
 }
 
 .dashboard-backdrop {
-  position: absolute;
-  inset: 10px max(6px, calc((100vw - 1200px) / 2));
+  position: fixed;
+  inset: 0;
   z-index: 0;
   background:
-    linear-gradient(rgba(235, 248, 224, 0.76), rgba(235, 248, 224, 0.76)),
-    url("../../../assets/image.png") center / clamp(520px, 58vw, 650px) auto repeat;
-  opacity: 0.85;
+    linear-gradient(rgba(235, 248, 224, 0.82), rgba(235, 248, 224, 0.82)),
+    url("../../../assets/image.png") center / 620px auto repeat;
+  opacity: 1;
 }
 
 .dashboard-header,
@@ -170,28 +171,30 @@
 
 .dashboard-shell {
   display: grid;
-  grid-template-columns: clamp(82px, 8vw, 112px) minmax(0, 1fr);
-  gap: clamp(18px, 2.6vw, 28px);
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 28px;
   padding: clamp(18px, 2.5vw, 28px) 0 34px;
 }
 
 .dashboard-sidebar {
-  width: clamp(52px, 5.4vw, 64px);
-  min-height: clamp(500px, 54vw, 570px);
+  width: 51px;
+  min-height: 497px;
   align-self: start;
+  margin-left: 18px;
+  margin-top: 26px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(42px, 5vw, 56px);
-  padding: clamp(52px, 6vw, 64px) 0 48px;
-  border-radius: 32px;
+  gap: 52px;
+  padding: 56px 0 48px;
+  border-radius: 28px;
   background: rgba(89, 104, 72, 0.72);
   box-shadow: 0 16px 28px rgba(57, 72, 45, 0.18);
 }
 
 .sidebar-avatar {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   overflow: hidden;
   border-radius: 50%;
   background: #f4e1cf;
@@ -206,18 +209,19 @@
 
 .sidebar-nav {
   display: grid;
-  gap: clamp(32px, 4vw, 42px);
+  gap: 35px;
 }
 
 .sidebar-link {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
   padding: 0;
   border-radius: 50%;
   color: #f8b916;
   background: rgba(72, 88, 61, 0.86);
+  text-decoration: none;
 }
 
 .sidebar-link.active {
@@ -226,8 +230,8 @@
 }
 
 .sidebar-link svg {
-  width: 21px;
-  height: 21px;
+  width: 20px;
+  height: 20px;
   stroke: currentColor;
   stroke-width: 2.6;
 }
@@ -268,11 +272,15 @@
 .primary-button {
   width: clamp(190px, 17vw, 230px);
   height: clamp(34px, 3vw, 42px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 999px;
   color: #3c3214;
   background: linear-gradient(180deg, #ffd550, #fac133);
   font-size: clamp(14px, 1.25vw, 18px);
   font-weight: 800;
+  text-decoration: none;
 }
 
 .stats-row {
@@ -591,7 +599,7 @@
 
 @media (min-width: 1280px) and (max-width: 1535px) {
   .dashboard-admin {
-    --page-width: min(1320px, calc(100vw - 56px));
+    --page-width: min(1250px, calc(100vw - 56px));
   }
 }
 

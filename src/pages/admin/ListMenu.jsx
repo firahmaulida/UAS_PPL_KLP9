@@ -59,7 +59,7 @@ const menus = [
   },
 ];
 
-const menuCards = Array.from({ length: 18 }, (_, index) => ({
+const initialMenuCards = Array.from({ length: 18 }, (_, index) => ({
   ...menus[index % menus.length],
   id: index + 1,
 }));
@@ -151,6 +151,25 @@ function EditIcon() {
   );
 }
 
+function UploadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 16V4" />
+      <path d="m7 9 5-5 5 5" />
+      <path d="M5 20h14" />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 3v4M17 3v4M4 9h16" />
+      <path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z" />
+    </svg>
+  );
+}
+
 function Header({ search, onSearch }) {
   return (
     <header className="list-menu-header">
@@ -209,7 +228,7 @@ function Sidebar() {
   );
 }
 
-function MenuCard({ item }) {
+function MenuCard({ item, onDelete }) {
   const statusClass = item.status.toLowerCase().replace(" ", "-");
 
   return (
@@ -230,7 +249,7 @@ function MenuCard({ item }) {
         <div className="lm-card-footer">
           <span className={`lm-status ${statusClass}`}>{item.status}</span>
           <div className="lm-actions">
-            <button className="lm-action delete" type="button">
+            <button className="lm-action delete" type="button" onClick={() => onDelete(item)}>
               <TrashIcon />
               Delete
             </button>
@@ -245,10 +264,216 @@ function MenuCard({ item }) {
   );
 }
 
+const emptyForm = {
+  image: "",
+  name: "",
+  description: "",
+  productionDate: "",
+  expiredDate: "",
+  price: "",
+  discountPrice: "",
+};
+
+function AddMenuModal({ form, imagePreview, onChange, onClose, onSubmit }) {
+  return (
+    <div className="lm-modal-backdrop" role="presentation">
+      <section
+        className="lm-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-menu-title"
+      >
+        <header className="lm-modal-header">
+          <h2 id="add-menu-title">Add Menu</h2>
+        </header>
+
+        <form className="lm-modal-form" onSubmit={onSubmit}>
+          <div className="lm-field lm-image-field">
+            <span className="lm-field-label">Menu Image</span>
+            <div className="lm-upload-row">
+              <label className="lm-upload-box">
+                <input
+                  accept="image/*"
+                  type="file"
+                  onChange={(event) => onChange("image", event.target.files?.[0] || "")}
+                />
+                <UploadIcon />
+                <span>
+                  File Upload
+                  <small>(Optional)</small>
+                </span>
+              </label>
+
+              <div className="lm-image-preview">
+                {imagePreview ? <img src={imagePreview} alt="Preview menu" /> : <span>Image</span>}
+              </div>
+            </div>
+          </div>
+
+          <label className="lm-field">
+            <span className="lm-field-label">Nama Menu</span>
+            <input
+              value={form.name}
+              onChange={(event) => onChange("name", event.target.value)}
+              placeholder="Menu Name"
+              type="text"
+            />
+          </label>
+
+          <label className="lm-field">
+            <span className="lm-field-label">Deskripsi Menu</span>
+            <input
+              value={form.description}
+              onChange={(event) => onChange("description", event.target.value)}
+              placeholder="Menu Name"
+              type="text"
+            />
+          </label>
+
+          <div className="lm-form-row">
+            <label className="lm-field lm-date-field">
+              <span className="lm-field-label">Production Date</span>
+              <span className="lm-input-icon">
+                <CalendarIcon />
+                <input
+                  value={form.productionDate}
+                  onChange={(event) => onChange("productionDate", event.target.value)}
+                  placeholder="Entry Date"
+                  type="text"
+                  onFocus={(event) => {
+                    event.currentTarget.type = "date";
+                  }}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.value) event.currentTarget.type = "text";
+                  }}
+                />
+              </span>
+            </label>
+
+            <label className="lm-field lm-date-field">
+              <span className="lm-field-label">Expired Date</span>
+              <span className="lm-input-icon">
+                <CalendarIcon />
+                <input
+                  value={form.expiredDate}
+                  onChange={(event) => onChange("expiredDate", event.target.value)}
+                  placeholder="Expired Date"
+                  type="text"
+                  onFocus={(event) => {
+                    event.currentTarget.type = "date";
+                  }}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.value) event.currentTarget.type = "text";
+                  }}
+                />
+              </span>
+            </label>
+          </div>
+
+          <div className="lm-form-row">
+            <label className="lm-field">
+              <span className="lm-field-label">Harga</span>
+              <input
+                value={form.price}
+                onChange={(event) => onChange("price", event.target.value)}
+                placeholder="RP"
+                type="text"
+              />
+            </label>
+
+            <label className="lm-field">
+              <span className="lm-field-label">Harga diskon</span>
+              <input
+                value={form.discountPrice}
+                onChange={(event) => onChange("discountPrice", event.target.value)}
+                placeholder="Rp"
+                type="text"
+              />
+            </label>
+          </div>
+
+          <div className="lm-modal-actions">
+            <button className="lm-modal-button" type="button" onClick={onClose}>
+              Batal
+            </button>
+            <button className="lm-modal-button" type="submit">
+              Simpan
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
+
+function DeleteMenuModal({ item, onClose, onConfirm }) {
+  return (
+    <div className="lm-modal-backdrop" role="presentation">
+      <section
+        className="lm-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-menu-title"
+      >
+        <h2 id="delete-menu-title">Yakin Hapus Menu</h2>
+        <p>
+          Menu akan terhapus di Dashboard Anda
+          <br />
+          Anda perlu menambahkan nya lgi
+        </p>
+
+        <div className="lm-delete-alert" aria-hidden="true">
+          !
+        </div>
+
+        <div className="lm-delete-actions">
+          <button className="lm-delete-button" type="button" onClick={onClose}>
+            Batal
+          </button>
+          <button className="lm-delete-button" type="button" onClick={() => onConfirm(item.id)}>
+            Hapus
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export function ListMenuAdmin() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All");
   const [store, setStore] = useState("All");
+  const [menuCards, setMenuCards] = useState(initialMenuCards);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+  const [imagePreview, setImagePreview] = useState("");
+
+  const handleFormChange = (field, value) => {
+    if (field === "image") {
+      setForm((currentForm) => ({ ...currentForm, image: value }));
+      setImagePreview(value ? URL.createObjectURL(value) : "");
+      return;
+    }
+
+    setForm((currentForm) => ({ ...currentForm, [field]: value }));
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setForm(emptyForm);
+    setImagePreview("");
+  };
+
+  const handleAddMenu = (event) => {
+    event.preventDefault();
+    closeModal();
+  };
+
+  const handleDeleteMenu = (id) => {
+    setMenuCards((currentMenus) => currentMenus.filter((item) => item.id !== id));
+    setDeleteTarget(null);
+  };
 
   const stores = useMemo(
     () => ["All", ...Array.from(new Set(menuCards.map((item) => item.store)))],
@@ -302,7 +527,7 @@ export function ListMenuAdmin() {
                 </select>
               </label>
 
-              <button className="lm-add-button" type="button">
+              <button className="lm-add-button" type="button" onClick={() => setIsModalOpen(true)}>
                 <PlusIcon />
                 Add menu
               </button>
@@ -310,7 +535,7 @@ export function ListMenuAdmin() {
 
           <section className="lm-grid" aria-label="Menu cards">
             {filteredMenus.map((item) => (
-              <MenuCard item={item} key={item.id} />
+              <MenuCard item={item} key={item.id} onDelete={setDeleteTarget} />
             ))}
 
             {filteredMenus.length === 0 && (
@@ -319,6 +544,24 @@ export function ListMenuAdmin() {
           </section>
         </section>
       </div>
+
+      {isModalOpen && (
+        <AddMenuModal
+          form={form}
+          imagePreview={imagePreview}
+          onChange={handleFormChange}
+          onClose={closeModal}
+          onSubmit={handleAddMenu}
+        />
+      )}
+
+      {deleteTarget && (
+        <DeleteMenuModal
+          item={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDeleteMenu}
+        />
+      )}
     </main>
   );
 }
