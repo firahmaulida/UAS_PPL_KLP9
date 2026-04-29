@@ -1,28 +1,28 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  Home,
   ShoppingBag,
   MessageCircle,
   User,
 } from "lucide-react";
 import userAvatar from "../assets/Rectangle.png";
 
-const SideBar = ({ activePage }) => {
+const SideBar = () => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
     {
       id: "dashboard",
       icon: LayoutDashboard,
       label: "Dashboard",
-      route: "/dashboard",
+      path: "/dashboard",
     },
-    { id: "menu", icon: ShoppingBag, label: "List Menu", route: "/menu" },
-    { id: "pesan", icon: MessageCircle, label: "Pesan", route: "/pesan" },
-    { id: "profil", icon: User, label: "Profil", route: "/profil" },
+    { id: "menu", icon: ShoppingBag, label: "List Menu", path: "/menu" },
+    { id: "pesan", icon: MessageCircle, label: "Pesan", path: "/pesan" },
+    { id: "profil", icon: User, label: "Profil", path: "/profil" },
   ];
 
   return (
@@ -57,12 +57,13 @@ const SideBar = ({ activePage }) => {
       <div className="flex flex-col gap-8">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activePage === item.id;
+          // Menggunakan location.pathname agar otomatis mendeteksi halaman aktif
+          const isActive = location.pathname === item.path;
 
           return (
             <button
               key={item.id}
-              onClick={() => navigate(item.route)}
+              onClick={() => navigate(item.path)}
               className={`flex items-center h-20 transition-all duration-300 ${
                 isHovered ? "px-4 rounded-full mx-1" : "justify-center"
               } ${
@@ -75,6 +76,7 @@ const SideBar = ({ activePage }) => {
                 <Icon
                   size={24}
                   className={isActive ? "text-[#63714e]" : "text-white"}
+                  strokeWidth={2.5}
                 />
               </div>
 
