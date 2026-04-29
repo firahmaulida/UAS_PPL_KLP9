@@ -1,5 +1,5 @@
 import { useId, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Import semua gambar lokal
 import bgLeft from "../assets/image.png";
@@ -10,6 +10,7 @@ import lockImg from "../assets/lock.png";
 import eyeImg from "../assets/eye.png";
 
 export const Login = () => {
+  const navigate = useNavigate();
   const roleSelectId = useId();
   const emailInputId = useId();
   const passwordInputId = useId();
@@ -29,6 +30,9 @@ export const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (role === "admin") {
+      navigate("/admin/dashboard");
+    }
   };
 
   const handleRoleSelect = (value) => {
