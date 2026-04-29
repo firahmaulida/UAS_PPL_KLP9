@@ -8,6 +8,9 @@ import { ProfilUser } from "./pages/user/Profil";
 import { EditProfil } from "./pages/user/EditProfil";
 import { GantiPassword } from "./pages/user/GantiPassword";
 import { Pengaturan } from "./pages/user/Pengaturan";
+import { DashboardUser } from "./pages/user/DashboardUser";
+import { ListMenu } from "./pages/user/ListMenu";
+import { MerchantMenu } from "./pages/user/MerchantMenu";
 
 function App() {
   return (
@@ -22,6 +25,9 @@ function App() {
         <Route path="/editprofil" element={<EditProfil />} /> 
         <Route path="/gantipassword" element={<GantiPassword />} />
         <Route path="/pengaturan" element={<Pengaturan />} />
+        <Route path="/dashboarduser" element={<DashboardUser />} />
+        <Route path="/menu" element={<ListMenu />} />
+        <Route path="/merchantmenu" element={<MerchantMenu />} />
       </Routes>
     </Router>
   );

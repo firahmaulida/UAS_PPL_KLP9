@@ -8,7 +8,7 @@ const SideBar = ({ activePage }) => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { id: "home", icon: Home, label: "Dashboard", route: "/" },
+    { id: "home", icon: Home, label: "Dashboard", route: "/dashboarduser" },
     { id: "menu", icon: ShoppingBag, label: "List Menu", route: "/menu" },
     { id: "pesan", icon: MessageCircle, label: "Pesan", route: "/pesan" },
     { id: "profil", icon: User, label: "Profil", route: "/profil" },
