@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Import semua gambar lokal
 import bgLeft from "../assets/image.png";
@@ -29,6 +30,7 @@ export const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    navigate("/dashboard");
   };
 
   const handleRoleSelect = (value) => {
@@ -38,6 +40,8 @@ export const Login = () => {
 
   const selectedLabel =
     roleOptions.find((o) => o.value === role)?.label || "Pilih Role";
+
+  const navigate = useNavigate();
 
   return (
     <main className="relative w-screen h-screen bg-green-50 overflow-hidden flex items-center justify-center">
