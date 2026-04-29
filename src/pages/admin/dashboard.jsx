@@ -173,8 +173,8 @@ function StoreIcon() {
 function AlertIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3 2 21h20L12 3Z" />
-      <path d="M12 9v5M12 17h.01" />
+      <path d="M12 3 2 21h20L12 3Z" fill="#ff0505" stroke="#ff0505" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 9v5M12 17h.01" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -260,8 +260,11 @@ function ProductCard({ item }) {
 
   return (
     <article className="menu-card">
-      <div className={`menu-thumb thumb-${item.id % 3}`}>
-        <img src={groceryImage} alt={item.name} />
+      <div className="menu-left">
+        <div className={`menu-thumb thumb-${item.id % 3}`}>
+          <img src={groceryImage} alt={item.name} />
+        </div>
+        <span className={`status-badge ${slug}`}>{item.status}</span>
       </div>
 
       <div className="menu-info">
@@ -269,9 +272,8 @@ function ProductCard({ item }) {
         <p>{item.store}</p>
         <div className="menu-price">
           <span>{item.oldPrice}</span>
-          <strong>{item.newPrice}</strong>
+          <strong>- {item.newPrice}</strong>
         </div>
-        <span className={`status-badge ${slug}`}>{item.status}</span>
       </div>
     </article>
   );

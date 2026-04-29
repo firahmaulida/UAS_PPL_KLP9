@@ -8,6 +8,9 @@ const menus = [
     name: "Chicken Teriyaki",
     price: "Rp. 27.000",
     salePrice: "Rp. 20.000",
+    description: "Ayam teriyaki dengan bumbu gurih manis dan potongan ayam lembut.",
+    productionDate: "10 April 2026",
+    expiredDate: "11 April 2026",
     expiry: "Menu Tak Habis Terjual",
     store: "Rumah Makan Pak Baka",
     status: "Expired",
@@ -17,6 +20,10 @@ const menus = [
     name: "Donat Gula",
     price: "Rp. 10.000",
     salePrice: "Rp. 7.000",
+    description:
+      "Donat Empuk dengan taburan Gula halus klasiknya. Kotak isi 6 Donat. Tekstur lembut dan manisnya pas, cocok untuk teman minum kopi dan teh",
+    productionDate: "10 April 2026",
+    expiredDate: "11 April 2026",
     expiry: "Exp. 1 hari lagi",
     store: "Bakery bu wani",
     status: "Available",
@@ -26,6 +33,9 @@ const menus = [
     name: "Brownies Coklat",
     price: "Rp. 40.000",
     salePrice: "Rp. 20.000",
+    description: "Brownies coklat lembut dengan rasa manis pekat dan potongan padat.",
+    productionDate: "10 April 2026",
+    expiredDate: "11 April 2026",
     expiry: "Exp. 3 hari lagi",
     store: "Toko Roti bersama",
     status: "Almost Expired",
@@ -35,6 +45,9 @@ const menus = [
     name: "Soto Ayam",
     price: "Rp. 27.000",
     salePrice: "Rp. 20.000",
+    description: "Soto ayam hangat dengan kuah ringan, sayur segar, dan isian lengkap.",
+    productionDate: "10 April 2026",
+    expiredDate: "11 April 2026",
     expiry: "Menu Tak Habis Terjual",
     store: "Rumah Makan Pak Baka",
     status: "Expired",
@@ -44,6 +57,9 @@ const menus = [
     name: "Brownies Coklat",
     price: "Rp. 40.000",
     salePrice: "Rp. 20.000",
+    description: "Brownies coklat lembut dengan rasa manis pekat dan potongan padat.",
+    productionDate: "10 April 2026",
+    expiredDate: "11 April 2026",
     expiry: "Exp. 3 hari lagi",
     store: "Toko Roti bersama",
     status: "Available",
@@ -53,6 +69,9 @@ const menus = [
     name: "Soto Ayam",
     price: "Rp. 27.000",
     salePrice: "Rp. 20.000",
+    description: "Soto ayam hangat dengan kuah ringan, sayur segar, dan isian lengkap.",
+    productionDate: "10 April 2026",
+    expiredDate: "11 April 2026",
     expiry: "Menu Tak Habis Terjual",
     store: "Rumah Makan Pak Baka",
     status: "Almost Expired",
@@ -228,7 +247,7 @@ function Sidebar() {
   );
 }
 
-function MenuCard({ item, onDelete }) {
+function MenuCard({ item, onDelete, onEdit }) {
   const statusClass = item.status.toLowerCase().replace(" ", "-");
 
   return (
@@ -253,7 +272,7 @@ function MenuCard({ item, onDelete }) {
               <TrashIcon />
               Delete
             </button>
-            <button className="lm-action" type="button">
+            <button className="lm-action" type="button" onClick={() => onEdit(item)}>
               <EditIcon />
               Edit
             </button>
@@ -439,6 +458,111 @@ function DeleteMenuModal({ item, onClose, onConfirm }) {
   );
 }
 
+function EditMenuModal({ form, imagePreview, onChange, onClose, onSubmit }) {
+  return (
+    <div className="lm-modal-backdrop" role="presentation">
+      <section
+        className="lm-edit-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-menu-title"
+      >
+        <header className="lm-edit-header">
+          <h2 id="edit-menu-title">Edit Menu</h2>
+        </header>
+
+        <form className="lm-edit-form" onSubmit={onSubmit}>
+          <label className="lm-edit-image-upload" title="Klik untuk mengganti gambar">
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={(event) => onChange("image", event.target.files?.[0] || "")}
+            />
+            <div className="lm-edit-image">
+              <img src={imagePreview} alt={form.name || "Menu"} />
+              <div className="lm-edit-image-overlay">Ganti Gambar</div>
+            </div>
+          </label>
+
+          <label className="lm-field">
+            <span className="lm-field-label">Nama Menu</span>
+            <input
+              value={form.name}
+              onChange={(event) => onChange("name", event.target.value)}
+              type="text"
+            />
+          </label>
+
+          <label className="lm-field">
+            <span className="lm-field-label">Deskripsi Menu</span>
+            <textarea
+              value={form.description}
+              onChange={(event) => onChange("description", event.target.value)}
+              rows={4}
+            />
+          </label>
+
+          <div className="lm-form-row">
+            <label className="lm-field lm-date-field">
+              <span className="lm-field-label">Production Date</span>
+              <span className="lm-input-icon">
+                <CalendarIcon />
+                <input
+                  value={form.productionDate}
+                  onChange={(event) => onChange("productionDate", event.target.value)}
+                  type="text"
+                />
+              </span>
+            </label>
+
+            <label className="lm-field lm-date-field">
+              <span className="lm-field-label">Expired Date</span>
+              <span className="lm-input-icon">
+                <CalendarIcon />
+                <input
+                  value={form.expiredDate}
+                  onChange={(event) => onChange("expiredDate", event.target.value)}
+                  type="text"
+                />
+              </span>
+            </label>
+          </div>
+
+          <div className="lm-form-row">
+            <label className="lm-field">
+              <span className="lm-field-label">Harga</span>
+              <input
+                value={form.price}
+                onChange={(event) => onChange("price", event.target.value)}
+                type="text"
+              />
+            </label>
+
+            <label className="lm-field">
+              <span className="lm-field-label">Harga diskon</span>
+              <input
+                value={form.salePrice}
+                onChange={(event) => onChange("salePrice", event.target.value)}
+                type="text"
+              />
+            </label>
+          </div>
+
+          <div className="lm-edit-actions">
+            <button className="lm-edit-button" type="button" onClick={onClose}>
+              Kembali
+            </button>
+            <button className="lm-edit-button" type="submit">
+              Simpan
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
+
 export function ListMenuAdmin() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All");
@@ -446,6 +570,9 @@ export function ListMenuAdmin() {
   const [menuCards, setMenuCards] = useState(initialMenuCards);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
+  const [editForm, setEditForm] = useState(null);
+  const [editImagePreview, setEditImagePreview] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [imagePreview, setImagePreview] = useState("");
 
@@ -475,9 +602,48 @@ export function ListMenuAdmin() {
     setDeleteTarget(null);
   };
 
+  const openEditModal = (item) => {
+    setEditTarget(item);
+    setEditForm({
+      name: item.name,
+      description: item.description,
+      productionDate: item.productionDate,
+      expiredDate: item.expiredDate,
+      price: item.price,
+      salePrice: item.salePrice,
+      image: "",
+    });
+    setEditImagePreview(groceryImage);
+  };
+
+  const handleEditFormChange = (field, value) => {
+    if (field === "image") {
+      setEditForm((currentForm) => ({ ...currentForm, image: value }));
+      setEditImagePreview(value ? URL.createObjectURL(value) : groceryImage);
+      return;
+    }
+    setEditForm((currentForm) => ({ ...currentForm, [field]: value }));
+  };
+
+  const closeEditModal = () => {
+    setEditTarget(null);
+    setEditForm(null);
+    setEditImagePreview("");
+  };
+
+  const handleEditMenu = (event) => {
+    event.preventDefault();
+    setMenuCards((currentMenus) =>
+      currentMenus.map((item) =>
+        item.id === editTarget.id ? { ...item, ...editForm } : item,
+      ),
+    );
+    closeEditModal();
+  };
+
   const stores = useMemo(
     () => ["All", ...Array.from(new Set(menuCards.map((item) => item.store)))],
-    [],
+    [menuCards],
   );
 
   const filteredMenus = useMemo(() => {
@@ -494,7 +660,7 @@ export function ListMenuAdmin() {
 
       return matchesSearch && matchesStatus && matchesStore;
     });
-  }, [search, status, store]);
+  }, [menuCards, search, status, store]);
 
   return (
     <main className="list-menu-page">
@@ -535,7 +701,12 @@ export function ListMenuAdmin() {
 
           <section className="lm-grid" aria-label="Menu cards">
             {filteredMenus.map((item) => (
-              <MenuCard item={item} key={item.id} onDelete={setDeleteTarget} />
+              <MenuCard
+                item={item}
+                key={item.id}
+                onDelete={setDeleteTarget}
+                onEdit={openEditModal}
+              />
             ))}
 
             {filteredMenus.length === 0 && (
@@ -560,6 +731,16 @@ export function ListMenuAdmin() {
           item={deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDeleteMenu}
+        />
+      )}
+
+      {editTarget && editForm && (
+        <EditMenuModal
+          form={editForm}
+          imagePreview={editImagePreview}
+          onChange={handleEditFormChange}
+          onClose={closeEditModal}
+          onSubmit={handleEditMenu}
         />
       )}
     </main>

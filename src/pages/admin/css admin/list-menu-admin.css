@@ -590,7 +590,21 @@
   font-size: 14px;
 }
 
-.lm-field input::placeholder {
+.lm-field textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1.5px solid #111;
+  border-radius: 5px;
+  padding: 9px;
+  color: #111;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.lm-field input::placeholder,
+.lm-field textarea::placeholder {
   color: #a8a8a8;
 }
 
@@ -716,6 +730,93 @@
   border: 0;
 }
 
+.lm-edit-modal {
+  width: min(440px, calc(100vw - 32px));
+  overflow: hidden;
+  border-radius: 28px;
+  background: #fdfdfd;
+  box-shadow: 0 18px 46px rgba(18, 22, 16, 0.35);
+}
+
+.lm-edit-header {
+  height: 60px;
+  display: grid;
+  place-items: center;
+  background: #F4C438;
+}
+
+.lm-edit-header h2 {
+  margin: 0;
+  color: #000;
+  font-size: 19px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.lm-edit-form {
+  display: grid;
+  gap: 14px;
+  padding: 24px 32px 36px;
+}
+
+.lm-edit-image-upload {
+  display: block;
+  cursor: pointer;
+}
+
+.lm-edit-image {
+  position: relative;
+  width: 240px;
+  height: 140px;
+  margin: 0 auto 10px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #e8dec7;
+}
+
+.lm-edit-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lm-edit-image-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.lm-edit-image-upload:hover .lm-edit-image-overlay {
+  opacity: 1;
+}
+
+.lm-edit-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 14px;
+}
+
+.lm-edit-button {
+  height: 44px;
+  border: 0;
+  border-radius: 22px;
+  color: #fff;
+  background: #F4C438;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+}
+
 @media (min-width: 1280px) {
   .list-menu-page {
     --page-width: min(1250px, calc(100vw - 56px));
@@ -823,13 +924,19 @@
   }
 
   .lm-form-row,
-  .lm-modal-actions {
+  .lm-modal-actions,
+  .lm-edit-actions {
     grid-template-columns: 1fr;
     gap: 10px;
   }
 
   .lm-modal-actions {
     margin-top: 24px;
+  }
+
+  .lm-edit-image {
+    width: 100%;
+    height: 180px;
   }
 
   .lm-delete-modal {

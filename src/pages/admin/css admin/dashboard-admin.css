@@ -349,15 +349,23 @@
 }
 
 .menu-card {
-  height: clamp(100px, 8.7vw, 118px);
+  min-height: clamp(100px, 8.7vw, 118px);
+  height: auto;
   display: grid;
   grid-template-columns: clamp(90px, 8vw, 112px) minmax(0, 1fr);
-  gap: 10px;
-  align-items: center;
-  padding: 12px 8px 11px 13px;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 14px;
   border-radius: 15px;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow);
+}
+
+.menu-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .menu-thumb {
@@ -433,12 +441,13 @@
   width: fit-content;
   display: inline-flex;
   justify-content: center;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 5px;
   color: #ffffff;
   font-size: clamp(10px, 0.85vw, 12px);
   line-height: 1;
   font-weight: 800;
+  margin: 0;
 }
 
 .status-badge.expired {
@@ -490,11 +499,6 @@
 .attention-title svg {
   width: 27px;
   height: 24px;
-  fill: #ff0505;
-  stroke: #ff0505;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 .manage-button {
