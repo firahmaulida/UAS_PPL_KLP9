@@ -5,6 +5,7 @@ import {
   ShoppingBag,
   MessageCircle,
   User,
+  Home, // Tambahkan Home jika ingin digunakan
 } from "lucide-react";
 import userAvatar from "../assets/Rectangle.png";
 
@@ -18,11 +19,26 @@ const SideBar = () => {
       id: "dashboard",
       icon: LayoutDashboard,
       label: "Dashboard",
-      path: "/dashboard",
+      path: "/dashboard", // Mengikuti rute utama dashboard
     },
-    { id: "menu", icon: ShoppingBag, label: "List Menu", path: "/menu" },
-    { id: "pesan", icon: MessageCircle, label: "Pesan", path: "/pesan" },
-    { id: "profil", icon: User, label: "Profil", path: "/profil" },
+    {
+      id: "menu",
+      icon: ShoppingBag,
+      label: "List Menu",
+      path: "/menu",
+    },
+    {
+      id: "pesan",
+      icon: MessageCircle,
+      label: "Pesan",
+      path: "/pesan",
+    },
+    {
+      id: "profil",
+      icon: User,
+      label: "Profil",
+      path: "/profil",
+    },
   ];
 
   return (
@@ -33,7 +49,7 @@ const SideBar = () => {
         isHovered ? "w-60 px-3" : "w-20 px-0"
       }`}
     >
-      {/* USER */}
+      {/* USER PROFILE SECTION */}
       <div
         className={`flex items-center mt-10 mb-12 transition-all duration-300 ${
           isHovered
@@ -53,11 +69,11 @@ const SideBar = () => {
         )}
       </div>
 
-      {/* MENU */}
+      {/* NAVIGATION MENU */}
       <div className="flex flex-col gap-8">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          // Menggunakan location.pathname agar otomatis mendeteksi halaman aktif
+          // Cek apakah path saat ini aktif
           const isActive = location.pathname === item.path;
 
           return (
