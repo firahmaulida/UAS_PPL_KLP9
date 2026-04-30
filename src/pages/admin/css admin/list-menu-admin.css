@@ -40,9 +40,10 @@
   height: 132px;
   display: grid;
   grid-template-columns: 210px minmax(320px, 640px) 1fr;
-  align-items: center;
+  align-items: start;
   gap: 32px;
-  padding-top: 16px;
+  padding-top: 34px;
+  pointer-events: none;
 }
 
 .lm-brand {
@@ -58,6 +59,7 @@
   box-shadow: 0 8px 17px rgba(60, 72, 50, 0.2);
   font-size: 29px;
   line-height: 1;
+  pointer-events: auto;
 }
 
 .lm-brand strong {
@@ -73,6 +75,7 @@
   border: 1px solid rgba(170, 170, 170, 0.6);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.88);
+  pointer-events: auto;
 }
 
 .lm-search input,
@@ -116,7 +119,8 @@
   justify-self: end;
   display: flex;
   align-items: center;
-  gap: 17px;
+  gap: 18px;
+  pointer-events: auto;
 }
 
 .lm-icon-button,
@@ -130,8 +134,8 @@
 }
 
 .lm-icon-button {
-  width: 31px;
-  height: 31px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   padding: 0;
@@ -140,27 +144,28 @@
 }
 
 .lm-icon-button svg {
-  width: 29px;
-  height: 29px;
+  width: 30px;
+  height: 30px;
   fill: currentColor;
   stroke: currentColor;
   stroke-width: 1.4;
 }
 
 .lm-profile {
-  display: flex;
+  display: grid;
+  grid-template-columns: clamp(50px, 4.4vw, 60px) auto 15px;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   padding: 0;
   color: #111;
   background: transparent;
-  font-size: 16px;
+  font-size: clamp(16px, 1.45vw, 20px);
   font-weight: 800;
 }
 
 .lm-profile img {
-  width: 50px;
-  height: 50px;
+  width: clamp(50px, 4.4vw, 60px);
+  height: clamp(50px, 4.4vw, 60px);
   border-radius: 50%;
   object-fit: cover;
   background: #f2e3c9;
@@ -168,8 +173,8 @@
 }
 
 .lm-profile svg {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   stroke: #111;
   stroke-width: 3;
 }
@@ -207,7 +212,6 @@
 }
 
 .lm-sidebar-avatar img,
-.lm-profile img,
 .lm-card-image img {
   width: 100%;
   height: 100%;
@@ -457,6 +461,264 @@
   font-weight: 800;
 }
 
+.lm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(32, 36, 28, 0.28);
+  backdrop-filter: blur(3px);
+}
+
+.lm-modal {
+  width: min(383px, calc(100vw - 32px));
+  overflow: hidden;
+  border-radius: 8px 8px 4px 4px;
+  background: #fdfdfd;
+  box-shadow: 0 18px 46px rgba(18, 22, 16, 0.35);
+}
+
+.lm-modal-header {
+  height: 49px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #ffd85a, #fbc847);
+}
+
+.lm-modal-header h2 {
+  margin: 0;
+  color: #000;
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.lm-modal-form {
+  display: grid;
+  gap: 10px;
+  padding: 26px 28px 42px;
+}
+
+.lm-field {
+  display: grid;
+  gap: 7px;
+}
+
+.lm-field-label {
+  color: #111;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.lm-upload-row {
+  display: grid;
+  grid-template-columns: 1fr 62px;
+  gap: 8px;
+}
+
+.lm-upload-box {
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  border: 1.5px dashed #111;
+  border-radius: 4px;
+  color: #9f9f9f;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+
+.lm-upload-box input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.lm-upload-box svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: #9a9a9a;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lm-upload-box span {
+  display: grid;
+  color: #aaa;
+  font-size: 15px;
+  line-height: 1.12;
+}
+
+.lm-upload-box small {
+  font-size: 15px;
+}
+
+.lm-image-preview {
+  height: 68px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 4px;
+  color: #666;
+  background: #d6d6d6;
+  font-size: 15px;
+}
+
+.lm-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lm-field input {
+  width: 100%;
+  height: 37px;
+  border: 1.5px solid #111;
+  border-radius: 5px;
+  padding: 0 9px;
+  color: #111;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.lm-field textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1.5px solid #111;
+  border-radius: 5px;
+  padding: 9px;
+  color: #111;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.lm-field input::placeholder,
+.lm-field textarea::placeholder {
+  color: #a8a8a8;
+}
+
+.lm-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.lm-input-icon {
+  position: relative;
+  display: block;
+}
+
+.lm-input-icon svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  fill: #afafaf;
+  stroke: #afafaf;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.lm-input-icon input {
+  padding-left: 35px;
+}
+
+.lm-modal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 49px;
+  margin-top: 60px;
+}
+
+.lm-modal-button {
+  height: 38px;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(180deg, #ffc526, #f6b414);
+  box-shadow: 0 6px 12px rgba(151, 112, 24, 0.18);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.lm-delete-modal {
+  width: min(415px, calc(100vw - 32px));
+  min-height: 435px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 62px 36px 50px;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(18, 22, 16, 0.35);
+  text-align: center;
+}
+
+.lm-delete-modal h2 {
+  margin: 0 0 22px;
+  color: #5c6d50;
+  font-size: 31px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.lm-delete-modal p {
+  margin: 0;
+  color: #111;
+  font-size: 13.5px;
+  line-height: 1.38;
+}
+
+.lm-delete-alert {
+  width: 102px;
+  height: 108px;
+  display: grid;
+  place-items: center;
+  margin: 33px 0 50px;
+  border-radius: 50%;
+  color: #fff;
+  background: #d33a2b;
+  font-size: 80px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.lm-delete-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 48px;
+}
+
+.lm-delete-button {
+  height: 40px;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(180deg, #ffc526, #f6b414);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -466,6 +728,93 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.lm-edit-modal {
+  width: min(440px, calc(100vw - 32px));
+  overflow: hidden;
+  border-radius: 28px;
+  background: #fdfdfd;
+  box-shadow: 0 18px 46px rgba(18, 22, 16, 0.35);
+}
+
+.lm-edit-header {
+  height: 60px;
+  display: grid;
+  place-items: center;
+  background: #F4C438;
+}
+
+.lm-edit-header h2 {
+  margin: 0;
+  color: #000;
+  font-size: 19px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.lm-edit-form {
+  display: grid;
+  gap: 14px;
+  padding: 24px 32px 36px;
+}
+
+.lm-edit-image-upload {
+  display: block;
+  cursor: pointer;
+}
+
+.lm-edit-image {
+  position: relative;
+  width: 240px;
+  height: 140px;
+  margin: 0 auto 10px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #e8dec7;
+}
+
+.lm-edit-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lm-edit-image-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.lm-edit-image-upload:hover .lm-edit-image-overlay {
+  opacity: 1;
+}
+
+.lm-edit-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 14px;
+}
+
+.lm-edit-button {
+  height: 44px;
+  border: 0;
+  border-radius: 22px;
+  color: #fff;
+  background: #F4C438;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
 }
 
 @media (min-width: 1280px) {
@@ -568,5 +917,38 @@
   .lm-card-image {
     height: 100%;
     min-height: 132px;
+  }
+
+  .lm-modal-form {
+    padding-inline: 22px;
+  }
+
+  .lm-form-row,
+  .lm-modal-actions,
+  .lm-edit-actions {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .lm-modal-actions {
+    margin-top: 24px;
+  }
+
+  .lm-edit-image {
+    width: 100%;
+    height: 180px;
+  }
+
+  .lm-delete-modal {
+    min-height: auto;
+    padding: 44px 24px 34px;
+  }
+
+  .lm-delete-modal h2 {
+    font-size: 26px;
+  }
+
+  .lm-delete-actions {
+    gap: 12px;
   }
 }

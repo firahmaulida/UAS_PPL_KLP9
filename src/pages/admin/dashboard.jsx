@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import groceryImage from "../../assets/image.png";
 import "./css admin/dashboard-admin.css";
 
@@ -172,18 +173,18 @@ function StoreIcon() {
 function AlertIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3 2 21h20L12 3Z" />
-      <path d="M12 9v5M12 17h.01" />
+      <path d="M12 3 2 21h20L12 3Z" fill="#ff0505" stroke="#ff0505" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 9v5M12 17h.01" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
 function Sidebar() {
   const navItems = [
-    { id: "home", label: "Dashboard", icon: <HomeIcon />, active: true },
-    { id: "menu", label: "Menu", icon: <MenuIcon /> },
-    { id: "messages", label: "Messages", icon: <MessageIcon /> },
-    { id: "profile", label: "Profile", icon: <UserIcon /> },
+    { id: "home", label: "Dashboard", icon: <HomeIcon />, to: "/admin/dashboard", active: true },
+    { id: "menu", label: "Menu", icon: <MenuIcon />, to: "/admin/list-menu" },
+    { id: "messages", label: "Messages", icon: <MessageIcon />, to: "/admin/messages" },
+    { id: "profile", label: "Profile", icon: <UserIcon />, to: "/admin/profile" },
   ];
 
   return (
@@ -194,14 +195,14 @@ function Sidebar() {
 
       <nav className="sidebar-nav">
         {navItems.map((item) => (
-          <button
+          <Link
             className={`sidebar-link ${item.active ? "active" : ""}`}
+            to={item.to}
             key={item.id}
-            type="button"
             aria-label={item.label}
           >
             {item.icon}
-          </button>
+          </Link>
         ))}
       </nav>
     </aside>
@@ -259,8 +260,11 @@ function ProductCard({ item }) {
 
   return (
     <article className="menu-card">
-      <div className={`menu-thumb thumb-${item.id % 3}`}>
-        <img src={groceryImage} alt={item.name} />
+      <div className="menu-left">
+        <div className={`menu-thumb thumb-${item.id % 3}`}>
+          <img src={groceryImage} alt={item.name} />
+        </div>
+        <span className={`status-badge ${slug}`}>{item.status}</span>
       </div>
 
       <div className="menu-info">
@@ -268,9 +272,8 @@ function ProductCard({ item }) {
         <p>{item.store}</p>
         <div className="menu-price">
           <span>{item.oldPrice}</span>
-          <strong>{item.newPrice}</strong>
+          <strong>- {item.newPrice}</strong>
         </div>
-        <span className={`status-badge ${slug}`}>{item.status}</span>
       </div>
     </article>
   );
@@ -329,9 +332,9 @@ export function DashboardAdmin() {
               <h1>Welcome , Admin!</h1>
               <p>Monitor and reduce food waste today.</p>
             </div>
-            <button className="primary-button" type="button">
+            <Link className="primary-button" to="/admin/list-menu">
               View Expiring Menu
-            </button>
+            </Link>
           </div>
 
           <div className="stats-row">
