@@ -1,5 +1,5 @@
 import { useId, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Import semua gambar lokal
 import bgLeft from "../assets/image.png";
@@ -8,21 +8,58 @@ import peopleImg from "../assets/people.png";
 import bawaImg from "../assets/bawah.png";
 import lockImg from "../assets/lock.png";
 import eyeImg from "../assets/eye.png";
-import emailImg from "../assets/email.png"; // icon envelope/email
-import tokoImg from "../assets/toko.png"; // icon toko/store
+import emailImg from "../assets/email.png";
+import tokoImg from "../assets/toko.png";
+
+// Icon SVG inline — tidak perlu file asset tambahan
+const PhoneIcon = () => (
+  <svg
+    aria-hidden="true"
+    className="w-6 h-6 opacity-90 shrink-0"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 12 19.79 19.79 0 0 1 1 3.18 2 2 0 0 1 2.96 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 5.5 5.5l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+  </svg>
+);
+
+const AddressIcon = () => (
+  <svg
+    aria-hidden="true"
+    className="w-6 h-6 opacity-90 shrink-0"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+    <circle cx="12" cy="9" r="2.5" />
+  </svg>
+);
 
 export const Register = () => {
+  const navigate = useNavigate();
   const roleSelectId = useId();
   const namaLengkapId = useId();
   const emailInputId = useId();
   const passwordInputId = useId();
+  const noTelpId = useId();
   const namaTokoId = useId();
+  const alamatTokoId = useId();
 
   const [role, setRole] = useState("");
   const [namaLengkap, setNamaLengkap] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [noTelp, setNoTelp] = useState("");
   const [namaToko, setNamaToko] = useState("");
+  const [alamatToko, setAlamatToko] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -33,6 +70,17 @@ export const Register = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    // Simpan role ke localStorage agar PrivateRoute bisa membacanya
+    localStorage.setItem("role", role);
+    // TODO: ganti dengan token asli dari response API register kamu
+    localStorage.setItem("token", "dummy-token");
+
+    if (role === "admin") {
+      navigate("/admin/dashboard");
+    } else {
+      navigate("/dashboarduser");
+    }
   };
 
   const handleRoleSelect = (value) => {
@@ -72,7 +120,8 @@ export const Register = () => {
       {/* Card Register */}
       <section
         aria-labelledby="register-title"
-        className="relative z-10 w-full max-w-lg mx-4 bg-white bg-opacity-75 rounded-3xl shadow-lg px-12 py-10"
+        className="relative z-10 w-full max-w-lg mx-4 bg-white bg-opacity-75 rounded-3xl shadow-lg px-12 py-10 overflow-y-auto"
+        style={{ maxHeight: "90vh" }}
       >
         <h1
           id="register-title"
@@ -180,7 +229,7 @@ export const Register = () => {
               src={emailImg}
               alt=""
               aria-hidden="true"
-              className="w-6 h-6 object-contain opacity-90 "
+              className="w-6 h-6 object-contain opacity-90"
             />
             <label htmlFor={emailInputId} className="sr-only">
               Email
@@ -197,13 +246,32 @@ export const Register = () => {
             />
           </div>
 
+          {/* No. Telepon */}
+          <div className={fieldClass} style={bgField}>
+            <PhoneIcon />
+            <label htmlFor={noTelpId} className="sr-only">
+              Nomor Telepon
+            </label>
+            <input
+              id={noTelpId}
+              type="tel"
+              value={noTelp}
+              onChange={(e) => setNoTelp(e.target.value)}
+              placeholder="No. Telepon"
+              autoComplete="tel"
+              inputMode="numeric"
+              className={inputClass}
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            />
+          </div>
+
           {/* Kata Sandi */}
           <div className={fieldClass} style={bgField}>
             <img
               src={lockImg}
               alt=""
               aria-hidden="true"
-              className="w-6 h-6 object-contain opacity-90 "
+              className="w-6 h-6 object-contain opacity-90"
             />
             <label htmlFor={passwordInputId} className="sr-only">
               Kata Sandi
@@ -235,29 +303,50 @@ export const Register = () => {
             </button>
           </div>
 
-          {/* Nama Toko — hanya muncul jika role = admin */}
+          {/* Field khusus Admin: Nama Toko & Alamat Toko */}
           {isAdmin && (
-            <div className={fieldClass} style={bgField}>
-              <img
-                src={tokoImg}
-                alt=""
-                aria-hidden="true"
-                className="w-6 h-6 object-contain opacity-90"
-              />
-              <label htmlFor={namaTokoId} className="sr-only">
-                Nama Toko
-              </label>
-              <input
-                id={namaTokoId}
-                type="text"
-                value={namaToko}
-                onChange={(e) => setNamaToko(e.target.value)}
-                placeholder="Nama Toko"
-                autoComplete="organization"
-                className={inputClass}
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-              />
-            </div>
+            <>
+              {/* Nama Toko */}
+              <div className={fieldClass} style={bgField}>
+                <img
+                  src={tokoImg}
+                  alt=""
+                  aria-hidden="true"
+                  className="w-6 h-6 object-contain opacity-90"
+                />
+                <label htmlFor={namaTokoId} className="sr-only">
+                  Nama Toko
+                </label>
+                <input
+                  id={namaTokoId}
+                  type="text"
+                  value={namaToko}
+                  onChange={(e) => setNamaToko(e.target.value)}
+                  placeholder="Nama Toko"
+                  autoComplete="organization"
+                  className={inputClass}
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                />
+              </div>
+
+              {/* Alamat Toko */}
+              <div className={fieldClass} style={bgField}>
+                <AddressIcon />
+                <label htmlFor={alamatTokoId} className="sr-only">
+                  Alamat Toko
+                </label>
+                <input
+                  id={alamatTokoId}
+                  type="text"
+                  value={alamatToko}
+                  onChange={(e) => setAlamatToko(e.target.value)}
+                  placeholder="Alamat Toko"
+                  autoComplete="street-address"
+                  className={inputClass}
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                />
+              </div>
+            </>
           )}
 
           {/* Tombol Daftar */}

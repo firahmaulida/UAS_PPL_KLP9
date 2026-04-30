@@ -1,371 +1,344 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import groceryImage from "../../assets/image.png";
-import "./css admin/dashboard-admin.css";
+import {
+  Bell,
+  Search,
+  Clock,
+  MessageCircle,
+  Trash2,
+  Store,
+  AlertTriangle,
+} from "lucide-react";
+import SideBarAdmin from "../../components/SideBarAdmin";
 
+import bgUtama from "../../assets/image.png";
+import userProfil from "../../assets/Rectangle.png";
+
+// Import gambar menu — sama persis dengan ListMenuAdmin
+import donatGula from "../../assets/donat gula.jpg";
+import croissant from "../../assets/croissant.jpg";
+import bolu from "../../assets/bolu.jpg";
+import brownies from "../../assets/brownies.jpg";
+import cake from "../../assets/cake.jpg";
+import cheescake from "../../assets/cheescake.jpg";
+
+const menuImages = {
+  "donat gula": donatGula,
+  croissant: croissant,
+  bolu: bolu,
+  brownies: brownies,
+  cake: cake,
+  cheescake: cheescake,
+};
+
+/* ─── Data menu (sama dengan ListMenuAdmin) ─────────────────── */
 const menuItems = [
   {
     id: 1,
-    name: "Chicken Teriyaki",
-    store: "Rumah Makan Pak Baka",
-    oldPrice: "Rp. 27.000",
-    newPrice: "Rp. 20.000",
-    status: "Expired",
-  },
-  {
-    id: 2,
     name: "Donat Gula",
-    store: "Bakery bu wani",
+    store: "BakeryPPL",
     oldPrice: "Rp. 10.000",
     newPrice: "Rp. 7.000",
     status: "Available",
+    image: "donat gula",
+  },
+  {
+    id: 2,
+    name: "Croissant",
+    store: "BakeryPPL",
+    oldPrice: "Rp. 15.000",
+    newPrice: "Rp. 10.000",
+    status: "Almost Expired",
+    image: "croissant",
   },
   {
     id: 3,
-    name: "Brownies Coklat",
-    store: "Toko Roti bersama",
-    oldPrice: "Rp. 40.000",
-    newPrice: "Rp. 20.000",
+    name: "Bolu",
+    store: "BakeryPPL",
+    oldPrice: "Rp. 25.000",
+    newPrice: "Rp. 12.000",
     status: "Expired",
+    image: "bolu",
   },
   {
     id: 4,
-    name: "Chicken Teriyaki",
-    store: "Rumah Makan Pak Baka",
-    oldPrice: "Rp. 27.000",
+    name: "Brownies",
+    store: "BakeryPPL",
+    oldPrice: "Rp. 40.000",
     newPrice: "Rp. 20.000",
-    status: "Expired",
+    status: "Almost Expired",
+    image: "brownies",
   },
   {
     id: 5,
-    name: "Donat Gula",
-    store: "Bakery bu wani",
-    oldPrice: "Rp. 10.000",
-    newPrice: "Rp. 7.000",
-    status: "Almost Expired",
+    name: "Cake",
+    store: "BakeryPPL",
+    oldPrice: "Rp. 55.000",
+    newPrice: "Rp. 35.000",
+    status: "Available",
+    image: "cake",
   },
   {
     id: 6,
-    name: "Brownies Coklat",
-    store: "Toko Roti bersama",
-    oldPrice: "Rp. 40.000",
-    newPrice: "Rp. 20.000",
+    name: "Cheesecake",
+    store: "BakeryPPL",
+    oldPrice: "Rp. 65.000",
+    newPrice: "Rp. 40.000",
     status: "Expired",
-  },
-  {
-    id: 7,
-    name: "Chicken Teriyaki",
-    store: "Rumah Makan Pak Baka",
-    oldPrice: "Rp. 27.000",
-    newPrice: "Rp. 20.000",
-    status: "Expired",
-  },
-  {
-    id: 8,
-    name: "Donat Gula",
-    store: "Bakery bu wani",
-    oldPrice: "Rp. 10.000",
-    newPrice: "Rp. 7.000",
-    status: "Almost Expired",
-  },
-  {
-    id: 9,
-    name: "Brownies Coklat",
-    store: "Toko Roti bersama",
-    oldPrice: "Rp. 40.000",
-    newPrice: "Rp. 20.000",
-    status: "Expired",
+    image: "cheescake",
   },
 ];
 
+/* ─── Recent Activity ───────────────────────────────────────── */
 const activities = [
   { id: 1, title: "Deleted Menu", time: "Admin 1 mnt ago", tone: "danger" },
-  { id: 2, title: "Message Received", time: "Admin 1 mnt ago", tone: "warning" },
-  { id: 3, title: "New Store Registered", time: "Admin 1 mnt ago", tone: "success" },
+  {
+    id: 2,
+    title: "Message Received",
+    time: "Admin 1 mnt ago",
+    tone: "warning",
+  },
+  {
+    id: 3,
+    title: "New Store Registered",
+    time: "Admin 1 mnt ago",
+    tone: "success",
+  },
 ];
 
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" />
-    </svg>
-  );
-}
+/* ─── Helpers ───────────────────────────────────────────────── */
+const statusColor = {
+  Expired: "bg-red-500",
+  Available: "bg-green-500",
+  "Almost Expired": "bg-yellow-400",
+};
 
-function BellIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  );
-}
+const activityBg = {
+  danger: "bg-red-100 text-red-500",
+  warning: "bg-yellow-100 text-yellow-500",
+  success: "bg-green-100 text-green-600",
+};
 
-function ChevronIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
+const ActivityIcon = ({ tone }) => {
+  if (tone === "danger") return <Trash2 size={14} />;
+  if (tone === "success") return <Store size={14} />;
+  return <MessageCircle size={14} />;
+};
 
-function HomeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m3 11 9-8 9 8" />
-      <path d="M5 10v10h5v-6h4v6h5V10" />
-    </svg>
-  );
-}
-
-function MenuIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 7h14M5 12h14M5 17h14" />
-    </svg>
-  );
-}
-
-function MessageIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" />
-    </svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M20 21a8 8 0 1 0-16 0" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v6l4 2" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15" />
-      <path d="M10 11v6M14 11v6" />
-    </svg>
-  );
-}
-
-function StoreIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 10h16l-1-5H5l-1 5Z" />
-      <path d="M5 10v10h14V10M9 20v-6h6v6" />
-    </svg>
-  );
-}
-
-function AlertIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3 2 21h20L12 3Z" fill="#ff0505" stroke="#ff0505" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M12 9v5M12 17h.01" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function Sidebar() {
-  const navItems = [
-    { id: "home", label: "Dashboard", icon: <HomeIcon />, to: "/admin/dashboard", active: true },
-    { id: "menu", label: "Menu", icon: <MenuIcon />, to: "/admin/list-menu" },
-    { id: "messages", label: "Messages", icon: <MessageIcon />, to: "/admin/messages" },
-    { id: "profile", label: "Profile", icon: <UserIcon />, to: "/admin/profile" },
-  ];
-
-  return (
-    <aside className="dashboard-sidebar" aria-label="Admin navigation">
-      <div className="sidebar-avatar">
-        <img src={groceryImage} alt="Admin profile" />
-      </div>
-
-      <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <Link
-            className={`sidebar-link ${item.active ? "active" : ""}`}
-            to={item.to}
-            key={item.id}
-            aria-label={item.label}
-          >
-            {item.icon}
-          </Link>
-        ))}
-      </nav>
-    </aside>
-  );
-}
-
-function Header({ search, onSearch }) {
-  return (
-    <header className="dashboard-header">
-      <a className="brand-mark" href="/">
-        <span>Food</span>
-        <strong>Waste</strong>
-      </a>
-
-      <label className="search-box">
-        <span className="sr-only">Search menu, store, reports</span>
-        <input
-          value={search}
-          onChange={(event) => onSearch(event.target.value)}
-          placeholder="Search menu, store, reports"
-          type="search"
-        />
-        <SearchIcon />
-      </label>
-
-      <div className="admin-toolbar">
-        <button className="icon-button notification-button" type="button" aria-label="Notifications">
-          <BellIcon />
-        </button>
-
-        <button className="admin-profile" type="button">
-          <img src={groceryImage} alt="Admin" />
-          <span>Admin</span>
-          <ChevronIcon />
-        </button>
-      </div>
-    </header>
-  );
-}
-
-function StatCard({ icon, label, value }) {
-  return (
-    <article className="stat-card">
-      <div className="stat-icon">{icon}</div>
-      <div>
-        <p>{label}</p>
-        <strong>{value}</strong>
-      </div>
-    </article>
-  );
-}
-
-function ProductCard({ item }) {
-  const slug = item.status.toLowerCase().replace(" ", "-");
-
-  return (
-    <article className="menu-card">
-      <div className="menu-left">
-        <div className={`menu-thumb thumb-${item.id % 3}`}>
-          <img src={groceryImage} alt={item.name} />
-        </div>
-        <span className={`status-badge ${slug}`}>{item.status}</span>
-      </div>
-
-      <div className="menu-info">
-        <h3>{item.name}</h3>
-        <p>{item.store}</p>
-        <div className="menu-price">
-          <span>{item.oldPrice}</span>
-          <strong>- {item.newPrice}</strong>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function ActivityIcon({ tone }) {
-  if (tone === "danger") return <TrashIcon />;
-  if (tone === "success") return <StoreIcon />;
-  return <MessageIcon />;
-}
-
-function ActivityList() {
-  return (
-    <section className="activity-card" aria-labelledby="recent-activity-title">
-      <h2 id="recent-activity-title">Recent Activity</h2>
-      <div className="activity-list">
-        {activities.map((activity) => (
-          <article className="activity-item" key={activity.id}>
-            <div className={`activity-icon ${activity.tone}`}>
-              <ActivityIcon tone={activity.tone} />
-            </div>
-            <div>
-              <h3>{activity.title}</h3>
-              <p>{activity.time}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
+/* ─── Main Component ────────────────────────────────────────── */
 export function DashboardAdmin() {
   const [search, setSearch] = useState("");
+  const [showNotif, setShowNotif] = useState(false);
+  const notifRef = useRef(null);
 
   const filteredMenu = useMemo(() => {
     const query = search.trim().toLowerCase();
     if (!query) return menuItems;
-
     return menuItems.filter((item) =>
-      [item.name, item.store, item.status].some((value) => value.toLowerCase().includes(query)),
+      [item.name, item.store, item.status].some((v) =>
+        v.toLowerCase().includes(query),
+      ),
     );
   }, [search]);
 
   return (
-    <main className="dashboard-admin">
-      <div className="dashboard-backdrop" aria-hidden="true" />
-      <Header search={search} onSearch={setSearch} />
+    <main className="relative w-screen h-screen overflow-hidden bg-[#effae8] font-sans">
+      {/* BACKGROUND */}
+      <div className="fixed inset-0 z-0 flex w-full h-full pointer-events-none">
+        <img
+          className="w-1/2 h-full object-cover opacity-80"
+          src={bgUtama}
+          alt=""
+        />
+        <img
+          className="w-1/2 h-full object-cover opacity-60"
+          src={bgUtama}
+          alt=""
+        />
+      </div>
 
-      <div className="dashboard-shell">
-        <Sidebar />
+      {/* LOGO */}
+      <header className="absolute top-6 left-12 z-30">
+        <div className="px-7 py-3 bg-[#63714ed1] rounded-tr-2xl rounded-br-2xl rounded-bl-2xl shadow-xl border border-white/20">
+          <h1 className="text-2xl font-black italic tracking-tighter text-white">
+            Food <span className="text-[#eb9f29]">Waste</span>
+          </h1>
+        </div>
+      </header>
 
-        <section className="dashboard-content" aria-label="Admin dashboard">
-          <div className="welcome-panel">
+      {/* SEARCH */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 w-96">
+        <div className="bg-white/80 rounded-full px-5 py-2.5 shadow-lg backdrop-blur-xl flex items-center gap-3">
+          <input
+            type="text"
+            placeholder="Search menu, store, reports"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-transparent outline-none text-[#63714e] text-sm"
+          />
+          <Search className="text-[#63714e]" size={18} />
+        </div>
+      </div>
+
+      {/* TOP RIGHT */}
+      <div
+        className="absolute top-6 right-12 flex items-center gap-4 z-30"
+        ref={notifRef}
+      >
+        <button
+          onClick={() => setShowNotif(!showNotif)}
+          className="relative w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all text-[#63714e]"
+        >
+          <Bell size={24} strokeWidth={2.5} />
+        </button>
+        <div className="p-0.5 bg-white rounded-full shadow-lg border border-gray-100 overflow-hidden flex items-center gap-2 pr-3">
+          <img
+            src={userProfil}
+            alt=""
+            className="w-9 h-9 rounded-full object-cover"
+          />
+          <span className="text-sm font-bold text-[#63714e]">Admin</span>
+        </div>
+      </div>
+
+      {/* MAIN LAYOUT */}
+      <div className="absolute top-24 left-12 right-12 bottom-4 flex items-stretch gap-4 z-10 overflow-hidden">
+        {/* SIDEBAR */}
+        <div className="h-full">
+          <SideBarAdmin />
+        </div>
+
+        {/* CONTENT */}
+        <section className="flex-1 overflow-y-auto pr-1 space-y-3">
+          {/* WELCOME */}
+          <div className="bg-white/70 rounded-[28px] shadow-xl px-8 py-5 flex justify-between items-center">
             <div>
-              <h1>Welcome , Admin!</h1>
-              <p>Monitor and reduce food waste today.</p>
+              <h1 className="text-2xl font-black text-[#63714e]">
+                Welcome, Admin!
+              </h1>
+              <p className="text-sm text-[#63714e]/70 mt-0.5">
+                Monitor and reduce food waste today.
+              </p>
             </div>
-            <Link className="primary-button" to="/admin/list-menu">
+            <Link
+              to="/admin/list-menu"
+              className="bg-[#f8bc22] hover:bg-[#e4aa16] text-white font-bold px-6 py-2 rounded-full text-sm transition-all"
+            >
               View Expiring Menu
             </Link>
           </div>
 
-          <div className="stats-row">
-            <StatCard icon={<ClockIcon />} label="Expiring Soon" value="122 Items" />
-            <StatCard icon={<MessageIcon />} label="New Messages" value="144 Messages" />
+          {/* STAT CARDS */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white/75 rounded-[22px] shadow-lg p-4 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-[#f8bc22] flex items-center justify-center text-white">
+                <Clock size={22} />
+              </div>
+              <div>
+                <p className="text-xs text-[#63714e]/70">Expiring Soon</p>
+                <h4 className="font-black text-[#63714e] text-xl">122 Items</h4>
+              </div>
+            </div>
+            <div className="bg-white/75 rounded-[22px] shadow-lg p-4 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-[#f8bc22] flex items-center justify-center text-white">
+                <MessageCircle size={22} />
+              </div>
+              <div>
+                <p className="text-xs text-[#63714e]/70">New Messages</p>
+                <h4 className="font-black text-[#63714e] text-xl">
+                  144 Messages
+                </h4>
+              </div>
+            </div>
           </div>
 
-          <div className="dashboard-grid">
-            <section className="menu-grid" aria-label="Expiring menu list">
-              {filteredMenu.map((item) => (
-                <ProductCard item={item} key={item.id} />
-              ))}
+          {/* GRID BAWAH */}
+          <div className="grid grid-cols-[3fr_1fr] gap-4">
+            {/* MENU LIST */}
+            <div className="bg-white/70 rounded-[28px] shadow-2xl p-5">
+              <h3 className="text-lg font-black text-[#63714e] mb-4">
+                Expiring Menu List
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
+                {filteredMenu.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-[20px] shadow-md hover:shadow-xl hover:-translate-y-1 transition-all p-2.5"
+                  >
+                    <img
+                      src={menuImages[item.image] ?? menuImages["donat gula"]}
+                      alt={item.name}
+                      className="w-full h-24 object-cover rounded-xl"
+                    />
+                    <div className="mt-2 flex items-center justify-between">
+                      <h4 className="font-bold text-[#63714e] text-sm">
+                        {item.name}
+                      </h4>
+                      <span
+                        className={`text-[9px] text-white font-bold px-2 py-0.5 rounded-full ${statusColor[item.status]}`}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-gray-500">{item.store}</p>
+                    <p className="text-xs text-[#63714e] mt-1">
+                      <span className="line-through text-gray-400">
+                        {item.oldPrice}
+                      </span>
+                      <span className="font-bold ml-1">{item.newPrice}</span>
+                    </p>
+                  </div>
+                ))}
+                {filteredMenu.length === 0 && (
+                  <div className="col-span-3 text-center text-[#63714e]/50 py-8 text-sm">
+                    Menu tidak ditemukan.
+                  </div>
+                )}
+              </div>
+            </div>
 
-              {filteredMenu.length === 0 && (
-                <div className="empty-state">Menu tidak ditemukan.</div>
-              )}
-            </section>
-
-            <aside className="right-panel">
-              <section className="attention-card" aria-labelledby="attention-title">
-                <div className="attention-title">
-                  <h2 id="attention-title">Need Attention</h2>
-                  <AlertIcon />
+            {/* RIGHT PANEL */}
+            <div className="space-y-3">
+              {/* NEED ATTENTION */}
+              <div className="bg-white/75 shadow-xl p-4 rounded-[22px]">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-base font-black text-[#63714e]">
+                    Need Attention
+                  </h3>
+                  <AlertTriangle size={18} className="text-red-500" />
                 </div>
-                <button className="manage-button" type="button">
+                <button className="w-full bg-[#f8bc22] hover:bg-[#e4aa16] text-white font-bold py-2 rounded-xl text-sm transition-all">
                   Manage Now
                 </button>
-              </section>
+              </div>
 
-              <ActivityList />
-            </aside>
+              {/* RECENT ACTIVITY */}
+              <div className="bg-white/75 shadow-xl p-4 rounded-[22px]">
+                <h3 className="text-base font-black text-[#63714e] mb-3">
+                  Recent Activity
+                </h3>
+                <div className="space-y-2">
+                  {activities.map((act) => (
+                    <div
+                      key={act.id}
+                      className="flex items-start gap-3 bg-[#f7f8ef] rounded-xl p-2.5"
+                    >
+                      <div
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center ${activityBg[act.tone]}`}
+                      >
+                        <ActivityIcon tone={act.tone} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-[#63714e]">
+                          {act.title}
+                        </p>
+                        <p className="text-[10px] text-gray-400">{act.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </div>

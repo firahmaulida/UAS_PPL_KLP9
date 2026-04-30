@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Bell, Search } from "lucide-react";
 import SideBar from "../../components/SideBar";
 import MenuDetailModal from "../../components/MenuDetailModal";
+import NotifDropdown from "../../components/NotifDropdown";
 
 // Import Assets
 import bgUtama from "../../assets/image.png";
@@ -11,6 +12,7 @@ import food1 from "../../assets/chat1.png";
 export const ListMenu = () => {
   const [search, setSearch] = useState("");
   const [selectedMenu, setSelectedMenu] = useState(null);
+  const [showNotif, setShowNotif] = useState(false);
 
   const menus = [
     {

@@ -12,7 +12,6 @@ import {
   ClipboardList,
 } from "lucide-react";
 
-// Assets
 import bgUtama from "../../assets/image.png";
 import userProfil from "../../assets/Rectangle.png";
 import food1 from "../../assets/chat1.png";
@@ -34,8 +33,16 @@ export const ProfilUser = () => {
     <main className="relative w-screen h-screen bg-[#effae8] overflow-hidden font-sans">
       {/* BACKGROUND */}
       <div className="fixed inset-0 z-0 flex w-full h-full pointer-events-none">
-        <img className="w-1/2 h-full object-cover opacity-80" src={bgUtama} alt="" />
-        <img className="w-1/2 h-full object-cover opacity-60" src={bgUtama} alt="" />
+        <img
+          className="w-1/2 h-full object-cover opacity-80"
+          src={bgUtama}
+          alt=""
+        />
+        <img
+          className="w-1/2 h-full object-cover opacity-60"
+          src={bgUtama}
+          alt=""
+        />
       </div>
 
       {/* LOGO */}
@@ -52,7 +59,6 @@ export const ProfilUser = () => {
         <button className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all text-[#63714e]">
           <Bell size={24} strokeWidth={2.5} />
         </button>
-
         <div className="p-0.5 bg-white rounded-full shadow-lg border border-gray-100 overflow-hidden">
           <img
             src={userProfil}
@@ -62,46 +68,45 @@ export const ProfilUser = () => {
         </div>
       </div>
 
-      {/* MAIN */}
-      <div className="absolute top-24 left-12 right-12 bottom-10 flex items-start gap-8 z-10">
+      {/* MAIN LAYOUT - sama persis struktur PesanUser */}
+      <div className="absolute top-24 left-12 right-12 bottom-10 flex items-stretch gap-8 z-10">
         {/* SIDEBAR */}
         <div className="h-full">
           <SideBar activePage="profil" />
         </div>
 
         {/* CONTENT */}
-        <section className="flex-1 flex gap-6">
+        <section className="flex-1 flex gap-6 overflow-hidden">
           {/* LEFT PANEL */}
-          <div className="flex-1 flex flex-col gap-5">
+          <div className="flex-1 flex flex-col gap-4 overflow-hidden">
             {/* IDENTITAS */}
-            <div className="bg-white/60 backdrop-blur-2xl rounded-[38px] shadow-2xl border border-white/40 h-36 px-10 flex items-center gap-6">
+            <div className="bg-white/60 backdrop-blur-2xl rounded-[38px] shadow-2xl border border-white/40 px-8 py-5 flex items-center gap-6">
               <img
                 src={userProfil}
                 alt="User"
-                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
               />
-
               <div>
-                <h2 className="text-4xl font-black text-[#63714e] leading-none">
+                <h2 className="text-3xl font-black text-[#63714e] leading-none">
                   KLP 09 PPL
                 </h2>
-                <p className="text-lg text-[#63714e]/75 font-medium mt-2">
+                <p className="text-base text-[#63714e]/75 font-medium mt-1">
                   klp09.ppl@gmail.com
                 </p>
               </div>
             </div>
 
             {/* MENU PROFIL */}
-            <div className="bg-white/55 backdrop-blur-2xl rounded-[38px] shadow-2xl border border-white/40 px-8 py-8 h-90 flex flex-col justify-between">
-              <div className="space-y-5">
+            <div className="flex-1 bg-white/55 backdrop-blur-2xl rounded-[38px] shadow-2xl border border-white/40 px-8 py-6 flex flex-col justify-between overflow-hidden">
+              <div className="space-y-4">
                 {/* EDIT PROFIL */}
                 <button
                   onClick={() => navigate("/editprofil")}
-                  className="w-full flex items-center justify-between border-b border-gray-300 pb-4 hover:translate-x-1 transition-all"
+                  className="w-full flex items-center justify-between border-b border-gray-200 pb-4 hover:translate-x-1 transition-all"
                 >
                   <div className="flex items-center gap-4">
                     <User size={18} className="text-[#f8bc22]" />
-                    <span className="font-semibold text-[#63714e] text-lg">
+                    <span className="font-semibold text-[#63714e] text-base">
                       Edit Profil
                     </span>
                   </div>
@@ -111,11 +116,11 @@ export const ProfilUser = () => {
                 {/* GANTI PASSWORD */}
                 <button
                   onClick={() => navigate("/gantipassword")}
-                  className="w-full flex items-center justify-between border-b border-gray-300 pb-4 hover:translate-x-1 transition-all"
+                  className="w-full flex items-center justify-between border-b border-gray-200 pb-4 hover:translate-x-1 transition-all"
                 >
                   <div className="flex items-center gap-4">
                     <Lock size={18} className="text-[#f8bc22]" />
-                    <span className="font-semibold text-[#63714e] text-lg">
+                    <span className="font-semibold text-[#63714e] text-base">
                       Ganti Password
                     </span>
                   </div>
@@ -125,11 +130,11 @@ export const ProfilUser = () => {
                 {/* PENGATURAN */}
                 <button
                   onClick={() => navigate("/pengaturan")}
-                  className="w-full flex items-center justify-between border-b border-gray-300 pb-4 hover:translate-x-1 transition-all"
+                  className="w-full flex items-center justify-between border-b border-gray-200 pb-4 hover:translate-x-1 transition-all"
                 >
                   <div className="flex items-center gap-4">
                     <Settings size={18} className="text-[#f8bc22]" />
-                    <span className="font-semibold text-[#63714e] text-lg">
+                    <span className="font-semibold text-[#63714e] text-base">
                       Pengaturan
                     </span>
                   </div>
@@ -140,7 +145,7 @@ export const ProfilUser = () => {
               {/* LOGOUT */}
               <button
                 onClick={() => setShowLogout(true)}
-                className="w-full bg-[#f8bc22] hover:bg-[#e4aa16] text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-all"
+                className="w-full bg-[#f8bc22] hover:bg-[#e4aa16] text-white font-bold py-3 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-all"
               >
                 <LogOut size={18} />
                 Keluar
@@ -149,7 +154,7 @@ export const ProfilUser = () => {
           </div>
 
           {/* RIGHT PANEL */}
-          <div className="w-72 bg-white/55 backdrop-blur-2xl rounded-[38px] shadow-2xl border border-white/40 px-6 py-6 h-fit">
+          <div className="w-72 bg-white/55 backdrop-blur-2xl rounded-[38px] shadow-2xl border border-white/40 px-6 py-6 overflow-y-auto">
             <div className="flex items-center gap-3 mb-5">
               <ClipboardList className="text-[#63714e]" size={19} />
               <h3 className="text-lg font-black text-[#63714e]">
@@ -167,9 +172,8 @@ export const ProfilUser = () => {
                     <img
                       src={item.img}
                       alt={item.nama}
-                      className="w-16 h-16 rounded-2xl object-cover"
+                      className="w-14 h-14 rounded-2xl object-cover"
                     />
-
                     <div>
                       <h4 className="font-bold text-[#63714e] text-sm">
                         {item.nama}
