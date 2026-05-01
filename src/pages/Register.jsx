@@ -1,10 +1,6 @@
 import { useId, useState } from "react";
-<<<<<<< HEAD
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-=======
-import { Link, useNavigate } from "react-router-dom";
->>>>>>> 792b11e34a4d63300ed13773a5602f989ddbca96
 
 // Import semua gambar lokal
 import bgLeft from "../assets/image.png";
