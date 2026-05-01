@@ -12,7 +12,7 @@ import eyeImg from "../assets/eye.png";
 import emailImg from "../assets/email.png";
 import tokoImg from "../assets/toko.png";
 
-// Icon SVG inline — tidak perlu file asset tambahan
+// Icon SVG inline
 const PhoneIcon = () => (
   <svg
     aria-hidden="true"
@@ -28,22 +28,6 @@ const PhoneIcon = () => (
   </svg>
 );
 
-const AddressIcon = () => (
-  <svg
-    aria-hidden="true"
-    className="w-6 h-6 opacity-90 shrink-0"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="white"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-    <circle cx="12" cy="9" r="2.5" />
-  </svg>
-);
-
 export const Register = () => {
   const navigate = useNavigate();
   const roleSelectId = useId();
@@ -52,7 +36,6 @@ export const Register = () => {
   const passwordInputId = useId();
   const noTelpId = useId();
   const namaTokoId = useId();
-  const alamatTokoId = useId();
 
   const [role, setRole] = useState("");
   const [namaLengkap, setNamaLengkap] = useState("");
@@ -60,65 +43,84 @@ export const Register = () => {
   const [password, setPassword] = useState("");
   const [noTelp, setNoTelp] = useState("");
   const [namaToko, setNamaToko] = useState("");
-  const [alamatToko, setAlamatToko] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const roleOptions = [
     { value: "pengguna", label: "Pengguna" },
     { value: "admin", label: "Admin" },
   ];
 
-const handleSubmit = async (event) => {
-  event.preventDefault();
-
-  if (!role || !namaLengkap || !email || !password) {
-    alert("Semua field wajib diisi!");
-    return;
-  }
-
-  try {
-    const response = await fetch('http://localhost:3000/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setErrorMessage("");
+    
+    // Validasi
+    if (!role || !namaLengkap || !email || !password) {
+      setErrorMessage("Semua field wajib diisi!");
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // 🔥 HAPUS alamatToko dari sini
+      const requestBody = {
         role,
         namaLengkap,
         email,
         password,
+        noTelp: noTelp || null,
         namaToko: role === "admin" ? namaToko : null,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert('Registrasi berhasil!');
-      console.log(data);
-
-      if (role === "admin") {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/user/dashboard');
-      }
-
+      };
       
-    } else {
-      alert(data.message || 'Registrasi gagal');
+      console.log("Mengirim data:", requestBody); // Debug log
+      
+      const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+      
+      const data = await response.json();
+      
+      console.log("Response:", data); // Debug log
+      
+      if (response.ok) {
+        alert('Registrasi berhasil!');
+        
+        // Simpan token jika ada
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userRole', data.user.role);
+          localStorage.setItem('userData', JSON.stringify(data.user));
+        }
+        
+        // Redirect sesuai role
+        if (role === "admin") {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/dashboarduser');
+        }
+      } else {
+        setErrorMessage(data.message || 'Registrasi gagal');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setErrorMessage('Tidak bisa konek ke server. Pastikan backend berjalan di http://localhost:3000');
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Tidak bisa konek ke server');
-  }
-};
-
+  };
 
   const handleRoleSelect = (value) => {
-    console.log("PILIH ROLE:", value);
     setRole(value);
     setDropdownOpen(false);
+    setErrorMessage("");
   };
 
   const selectedLabel =
@@ -126,7 +128,6 @@ const handleSubmit = async (event) => {
 
   const isAdmin = role === "admin";
 
-  // Shared field style
   const fieldClass =
     "relative w-full h-14 rounded-2xl flex items-center px-6 gap-4";
   const bgField = { backgroundColor: "rgba(99, 113, 78, 0.80)" };
@@ -135,14 +136,12 @@ const handleSubmit = async (event) => {
 
   return (
     <main className="relative w-screen h-screen bg-green-50 overflow-hidden flex items-center justify-center">
-      {/* Background kiri */}
       <img
         className="absolute top-0 left-0 h-full w-auto object-cover pointer-events-none select-none opacity-80"
         alt=""
         src={bgLeft}
         aria-hidden="true"
       />
-      {/* Background kanan */}
       <img
         className="absolute top-0 right-0 h-full w-auto object-cover pointer-events-none select-none opacity-60"
         alt=""
@@ -150,7 +149,6 @@ const handleSubmit = async (event) => {
         aria-hidden="true"
       />
 
-      {/* Card Register */}
       <section
         aria-labelledby="register-title"
         className="relative z-10 w-full max-w-lg mx-4 bg-white bg-opacity-75 rounded-3xl shadow-lg px-12 py-10 overflow-y-auto"
@@ -173,20 +171,23 @@ const handleSubmit = async (event) => {
           Create your new Account
         </p>
 
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+            {errorMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Pilih Role — custom dropdown */}
+          {/* Pilih Role */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setDropdownOpen((prev) => !prev)}
               className="w-full h-14 flex items-center gap-4 px-6 rounded-2xl text-white text-sm font-medium"
-              style={{
-                backgroundColor: "rgba(99, 113, 78, 0.80)",
-                fontFamily: "'Poppins', sans-serif",
-              }}
+              style={bgField}
               aria-haspopup="listbox"
               aria-expanded={dropdownOpen}
-              aria-labelledby={roleSelectId}
+              disabled={isLoading}
             >
               <img
                 src={peopleImg}
@@ -205,7 +206,7 @@ const handleSubmit = async (event) => {
               />
             </button>
 
-            {dropdownOpen && (
+            {dropdownOpen && !isLoading && (
               <ul
                 role="listbox"
                 className="absolute z-20 mt-1 w-full rounded-2xl shadow-lg overflow-hidden"
@@ -218,7 +219,6 @@ const handleSubmit = async (event) => {
                     aria-selected={role === option.value}
                     onClick={() => handleRoleSelect(option.value)}
                     className="px-6 py-3 text-sm text-white cursor-pointer hover:bg-yellow-400 flex items-center gap-3 transition-colors"
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
                   >
                     <img
                       src={peopleImg}
@@ -241,9 +241,6 @@ const handleSubmit = async (event) => {
               aria-hidden="true"
               className="w-6 h-6 object-contain opacity-90"
             />
-            <label htmlFor={namaLengkapId} className="sr-only">
-              Nama Lengkap
-            </label>
             <input
               id={namaLengkapId}
               type="text"
@@ -252,7 +249,7 @@ const handleSubmit = async (event) => {
               placeholder="Nama Lengkap"
               autoComplete="name"
               className={inputClass}
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              disabled={isLoading}
             />
           </div>
 
@@ -264,9 +261,6 @@ const handleSubmit = async (event) => {
               aria-hidden="true"
               className="w-6 h-6 object-contain opacity-90"
             />
-            <label htmlFor={emailInputId} className="sr-only">
-              Email
-            </label>
             <input
               id={emailInputId}
               type="email"
@@ -275,16 +269,13 @@ const handleSubmit = async (event) => {
               placeholder="Email"
               autoComplete="email"
               className={inputClass}
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              disabled={isLoading}
             />
           </div>
 
           {/* No. Telepon */}
           <div className={fieldClass} style={bgField}>
             <PhoneIcon />
-            <label htmlFor={noTelpId} className="sr-only">
-              Nomor Telepon
-            </label>
             <input
               id={noTelpId}
               type="tel"
@@ -294,7 +285,7 @@ const handleSubmit = async (event) => {
               autoComplete="tel"
               inputMode="numeric"
               className={inputClass}
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              disabled={isLoading}
             />
           </div>
 
@@ -306,9 +297,6 @@ const handleSubmit = async (event) => {
               aria-hidden="true"
               className="w-6 h-6 object-contain opacity-90"
             />
-            <label htmlFor={passwordInputId} className="sr-only">
-              Kata Sandi
-            </label>
             <input
               id={passwordInputId}
               type={showPassword ? "text" : "password"}
@@ -317,15 +305,12 @@ const handleSubmit = async (event) => {
               placeholder="Kata Sandi"
               autoComplete="new-password"
               className={inputClass}
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              aria-label={
-                showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
-              }
-              aria-pressed={showPassword}
+              disabled={isLoading}
             >
               <img
                 src={eyeImg}
@@ -336,72 +321,42 @@ const handleSubmit = async (event) => {
             </button>
           </div>
 
-          {/* Field khusus Admin: Nama Toko & Alamat Toko */}
+          {/* Field Admin - hanya Nama Toko, tanpa Alamat Toko */}
           {isAdmin && (
-            <>
-              {/* Nama Toko */}
-              <div className={fieldClass} style={bgField}>
-                <img
-                  src={tokoImg}
-                  alt=""
-                  aria-hidden="true"
-                  className="w-6 h-6 object-contain opacity-90"
-                />
-                <label htmlFor={namaTokoId} className="sr-only">
-                  Nama Toko
-                </label>
-                <input
-                  id={namaTokoId}
-                  type="text"
-                  value={namaToko}
-                  onChange={(e) => setNamaToko(e.target.value)}
-                  placeholder="Nama Toko"
-                  autoComplete="organization"
-                  className={inputClass}
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                />
-              </div>
-
-              {/* Alamat Toko */}
-              <div className={fieldClass} style={bgField}>
-                <AddressIcon />
-                <label htmlFor={alamatTokoId} className="sr-only">
-                  Alamat Toko
-                </label>
-                <input
-                  id={alamatTokoId}
-                  type="text"
-                  value={alamatToko}
-                  onChange={(e) => setAlamatToko(e.target.value)}
-                  placeholder="Alamat Toko"
-                  autoComplete="street-address"
-                  className={inputClass}
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                />
-              </div>
-            </>
+            <div className={fieldClass} style={bgField}>
+              <img
+                src={tokoImg}
+                alt=""
+                aria-hidden="true"
+                className="w-6 h-6 object-contain opacity-90"
+              />
+              <input
+                id={namaTokoId}
+                type="text"
+                value={namaToko}
+                onChange={(e) => setNamaToko(e.target.value)}
+                placeholder="Nama Toko"
+                autoComplete="organization"
+                className={inputClass}
+                disabled={isLoading}
+              />
+            </div>
           )}
 
           {/* Tombol Daftar */}
           <button
             type="submit"
-            className="w-72 h-14 mx-auto mt-4 rounded-2xl text-white text-xl font-medium shadow-md transition-colors"
+            className="w-72 h-14 mx-auto mt-4 rounded-2xl text-white text-xl font-medium shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: "#F8BC22",
               fontFamily: "'Poppins', sans-serif",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "#e0a91e")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "#F8BC22")
-            }
+            disabled={isLoading}
           >
-            Daftar
+            {isLoading ? "Memproses..." : "Daftar"}
           </button>
         </form>
 
-        {/* Sudah punya akun */}
         <p
           className="text-center text-xs text-gray-600 mt-12"
           style={{ fontFamily: "'Poppins', sans-serif" }}

@@ -4,25 +4,25 @@ const db = require('./db');
 
 const app = express();
 
-// ✅ Middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// ✅ Test API (biar tahu server hidup)
+// Test API
 app.get('/', (req, res) => {
   res.send('API berjalan 🚀');
 });
 
-// ✅ Test route API
+// Test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'API OK' });
 });
 
-// ✅ Routes
+// Routes - PASTIKAN INI
 const authRoutes = require('./routes/auth');
-app.use('/api', authRoutes);
+app.use('/api', authRoutes);  // 👈 Ini yang membuat endpoint menjadi /api/login dan /api/register
 
-// ✅ CEK KONEKSI DATABASE
+// Cek koneksi database
 db.connect((err) => {
   if (err) {
     console.error('❌ Gagal konek ke database:', err);
@@ -31,19 +31,21 @@ db.connect((err) => {
   }
 });
 
-// ✅ HANDLE ERROR GLOBAL (PENTING)
+// Error handler
 app.use((err, req, res, next) => {
   console.error('🔥 ERROR SERVER:', err.stack);
   res.status(500).json({ message: 'Terjadi kesalahan di server' });
 });
 
-// ✅ HANDLE ROUTE TIDAK ADA
+// Route tidak ditemukan
 app.use((req, res) => {
   res.status(404).json({ message: 'Route tidak ditemukan' });
 });
 
-// ✅ JALANKAN SERVER
+// Jalankan server
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server jalan di http://localhost:${PORT}`);
+  console.log(`📝 Register: POST http://localhost:${PORT}/api/register`);
+  console.log(`🔐 Login: POST http://localhost:${PORT}/api/login`);
 });
