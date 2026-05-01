@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Import semua gambar lokal
 import bgLeft from "../assets/image.png";
@@ -12,6 +13,7 @@ import emailImg from "../assets/email.png"; // icon envelope/email
 import tokoImg from "../assets/toko.png"; // icon toko/store
 
 export const Register = () => {
+  const navigate = useNavigate();
   const roleSelectId = useId();
   const namaLengkapId = useId();
   const emailInputId = useId();
@@ -31,11 +33,53 @@ export const Register = () => {
     { value: "admin", label: "Admin" },
   ];
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-  };
+const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  if (!role || !namaLengkap || !email || !password) {
+    alert("Semua field wajib diisi!");
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:3000/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        role,
+        namaLengkap,
+        email,
+        password,
+        namaToko: role === "admin" ? namaToko : null,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert('Registrasi berhasil!');
+      console.log(data);
+
+      if (role === "admin") {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/user/dashboard');
+      }
+
+      
+    } else {
+      alert(data.message || 'Registrasi gagal');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Tidak bisa konek ke server');
+  }
+};
 
   const handleRoleSelect = (value) => {
+    console.log("PILIH ROLE:", value);
     setRole(value);
     setDropdownOpen(false);
   };
