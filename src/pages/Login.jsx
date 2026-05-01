@@ -34,7 +34,7 @@ export const Login = () => {
     if (role === "admin") {
       navigate("/admin/dashboard");
     } else {
-      navigate("/dashboard");
+      navigate("/dashboardUser");
     }
   };
 

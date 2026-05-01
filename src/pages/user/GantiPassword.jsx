@@ -40,13 +40,21 @@ export const GantiPassword = () => {
     <main className="relative w-screen h-screen bg-[#effae8] overflow-hidden font-sans">
       {/* BACKGROUND */}
       <div className="fixed inset-0 z-0 flex w-full h-full pointer-events-none">
-        <img className="w-1/2 h-full object-cover opacity-80" src={bgUtama} alt="" />
-        <img className="w-1/2 h-full object-cover opacity-60" src={bgUtama} alt="" />
+        <img
+          className="w-1/2 h-full object-cover opacity-80"
+          src={bgUtama}
+          alt=""
+        />
+        <img
+          className="w-1/2 h-full object-cover opacity-60"
+          src={bgUtama}
+          alt=""
+        />
       </div>
 
       {/* LOGO */}
       <header className="absolute top-6 left-12 z-30">
-        <div className="px-7 py-3 bg-[#63714ed1] rounded-tr-2xl rounded-br-2xl rounded-bl-2xl shadow-xl">
+        <div className="px-7 py-3 bg-[#63714ed1] rounded-tr-2xl rounded-br-2xl rounded-bl-2xl shadow-xl border border-white/20">
           <h1 className="text-2xl font-black italic tracking-tighter text-white">
             Food <span className="text-[#eb9f29]">Waste</span>
           </h1>
@@ -55,37 +63,51 @@ export const GantiPassword = () => {
 
       {/* TOP RIGHT */}
       <div className="absolute top-6 right-12 flex items-center gap-6 z-30">
-        <button className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg text-[#63714e]">
-          <Bell size={24} />
+        <button className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all text-[#63714e]">
+          <Bell size={24} strokeWidth={2.5} />
         </button>
-
-        <img src={userProfil} alt="" className="w-12 h-12 rounded-full object-cover" />
+        <div className="p-0.5 bg-white rounded-full shadow-lg border border-gray-100 overflow-hidden">
+          <img
+            src={userProfil}
+            alt=""
+            className="w-12 h-12 rounded-full object-cover"
+          />
+        </div>
       </div>
 
-      {/* MAIN */}
-      <div className="absolute top-24 left-12 right-12 bottom-10 flex gap-8 z-10">
-        <SideBar activePage="profil" />
+      {/* MAIN LAYOUT */}
+      <div className="absolute top-24 left-12 right-12 bottom-10 flex items-stretch gap-8 z-10">
+        {/* SIDEBAR */}
+        <div className="h-full">
+          <SideBar activePage="profil" />
+        </div>
 
-        <section className="flex-1 flex gap-6">
+        {/* CONTENT */}
+        <section className="flex-1 flex gap-6 overflow-hidden">
           {/* FORM KIRI */}
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-6">
+          <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+            {/* JUDUL + TOMBOL */}
+            <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-3xl font-black text-[#63714e]">Ganti Password</h2>
-                <p className="text-sm text-[#63714e]/70">Perbarui keamanan akun Anda</p>
+                <h2 className="text-2xl font-black text-[#63714e]">
+                  Ganti Password
+                </h2>
+                <p className="text-xs text-[#63714e]/70">
+                  Perbarui keamanan akun Anda
+                </p>
               </div>
-
               <button
                 onClick={() => navigate("/profil")}
-                className="px-6 py-2 rounded-full border border-[#63714e] text-[#63714e] flex items-center gap-2"
+                className="px-5 py-2 rounded-full border border-[#63714e] text-[#63714e] text-sm flex items-center gap-2 hover:bg-[#63714e]/10 transition-all"
               >
-                <ArrowLeft size={16} />
+                <ArrowLeft size={15} />
                 Kembali
               </button>
             </div>
 
-            <div className="bg-white/60 backdrop-blur-2xl rounded-[35px] shadow-2xl p-8">
-              <div className="space-y-6">
+            {/* FORM */}
+            <div className="flex-1 bg-white/60 backdrop-blur-2xl rounded-[35px] shadow-2xl p-7 flex flex-col justify-between overflow-hidden">
+              <div className="space-y-4">
                 <PasswordField
                   label="Password Lama"
                   name="lama"
@@ -93,7 +115,6 @@ export const GantiPassword = () => {
                   onChange={handleChange}
                   show={showPassword}
                 />
-
                 <PasswordField
                   label="Password Baru"
                   name="baru"
@@ -101,7 +122,6 @@ export const GantiPassword = () => {
                   onChange={handleChange}
                   show={showPassword}
                 />
-
                 <PasswordField
                   label="Konfirmasi Password"
                   name="konfirmasi"
@@ -112,41 +132,41 @@ export const GantiPassword = () => {
 
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-sm text-[#63714e] flex items-center gap-2"
+                  className="text-xs text-[#63714e] flex items-center gap-2 hover:opacity-70 transition-all"
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                   {showPassword ? "Sembunyikan Password" : "Tampilkan Password"}
                 </button>
-
-                <button
-                  onClick={() => setShowConfirm(true)}
-                  className="w-full bg-[#f8bc22] hover:bg-[#e4aa16] text-white font-bold py-4 rounded-2xl shadow-lg transition-all"
-                >
-                  Simpan Password Baru
-                </button>
               </div>
+
+              <button
+                onClick={() => setShowConfirm(true)}
+                className="w-full bg-[#f8bc22] hover:bg-[#e4aa16] text-white font-bold py-3 rounded-2xl shadow-lg transition-all text-sm"
+              >
+                Simpan Password Baru
+              </button>
             </div>
           </div>
 
           {/* PANEL KANAN */}
-          <div className="w-80 bg-white/60 backdrop-blur-2xl rounded-[35px] shadow-2xl p-7 h-fit">
-            <h3 className="text-lg font-bold text-[#63714e] mb-6">Tips Keamanan</h3>
+          <div className="w-72 bg-white/60 backdrop-blur-2xl rounded-[35px] shadow-2xl p-6 overflow-y-auto">
+            <h3 className="text-base font-bold text-[#63714e] mb-4">
+              Tips Keamanan
+            </h3>
 
-            <div className="space-y-5">
+            <div className="space-y-3">
               <SecurityItem
-                icon={<ShieldCheck size={18} />}
+                icon={<ShieldCheck size={16} />}
                 title="Gunakan kombinasi unik"
                 text="Campurkan huruf besar, kecil, angka, dan simbol."
               />
-
               <SecurityItem
-                icon={<KeyRound size={18} />}
+                icon={<KeyRound size={16} />}
                 title="Minimal 8 karakter"
                 text="Password yang lebih panjang lebih aman digunakan."
               />
-
               <SecurityItem
-                icon={<BadgeCheck size={18} />}
+                icon={<BadgeCheck size={16} />}
                 title="Jangan gunakan data pribadi"
                 text="Hindari nama, tanggal lahir, atau nomor telepon."
               />
@@ -155,7 +175,7 @@ export const GantiPassword = () => {
         </section>
       </div>
 
-      {/* POPUP */}
+      {/* MODALS */}
       {showConfirm && (
         <PasswordConfirmModal
           onClose={() => setShowConfirm(false)}
@@ -167,9 +187,7 @@ export const GantiPassword = () => {
       )}
 
       {showSuccess && (
-        <PasswordSuccessModal
-          onDone={() => navigate("/profil")}
-        />
+        <PasswordSuccessModal onDone={() => navigate("/profil")} />
       )}
     </main>
   );
@@ -177,16 +195,18 @@ export const GantiPassword = () => {
 
 const PasswordField = ({ label, name, value, onChange, show }) => {
   return (
-    <div>
-      <label className="block text-[#63714e] font-semibold mb-2">{label}</label>
-      <div className="bg-[#7d8767] rounded-2xl px-4 py-4 flex items-center gap-3 shadow-inner">
-        <LockKeyhole size={17} className="text-white" />
+    <div className="flex flex-col gap-1">
+      <label className="text-xs font-semibold text-[#63714e]/70 px-1">
+        {label}
+      </label>
+      <div className="bg-[#7d8767] rounded-2xl px-4 py-3 flex items-center gap-3 shadow-inner">
+        <LockKeyhole size={16} className="text-white" />
         <input
           type={show ? "text" : "password"}
           name={name}
           value={value}
           onChange={onChange}
-          className="w-full bg-transparent outline-none text-white placeholder:text-white/70"
+          className="w-full bg-transparent outline-none text-white text-sm placeholder:text-white/70"
         />
       </div>
     </div>
@@ -195,12 +215,12 @@ const PasswordField = ({ label, name, value, onChange, show }) => {
 
 const SecurityItem = ({ icon, title, text }) => {
   return (
-    <div className="bg-[#f7f8ef] rounded-2xl p-4 shadow-sm">
-      <div className="flex items-center gap-3 mb-2 text-[#63714e] font-bold">
+    <div className="bg-[#f7f8ef] rounded-2xl p-3 shadow-sm">
+      <div className="flex items-center gap-2 mb-1 text-[#63714e] font-bold text-sm">
         {icon}
         {title}
       </div>
-      <p className="text-sm text-[#63714e]/70 leading-relaxed">{text}</p>
+      <p className="text-xs text-[#63714e]/70 leading-relaxed">{text}</p>
     </div>
   );
 };

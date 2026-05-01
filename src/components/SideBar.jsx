@@ -1,80 +1,68 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  MessageCircle,
-  User,
-} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Home, ShoppingBag, MessageCircle, User } from "lucide-react";
 import userAvatar from "../assets/Rectangle.png";
 
-const SideBar = () => {
+const SideBar = ({ activePage }) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const menuItems = [
-    {
-      id: "dashboard",
-      icon: LayoutDashboard,
-      label: "Dashboard",
-      path: "/dashboard",
-    },
-    { id: "menu", icon: ShoppingBag, label: "List Menu", path: "/menu" },
-    { id: "pesan", icon: MessageCircle, label: "Pesan", path: "/pesan" },
-    { id: "profil", icon: User, label: "Profil", path: "/profil" },
+    { id: "home", icon: Home, label: "Dashboard", route: "/dashboarduser" },
+    { id: "menu", icon: ShoppingBag, label: "List Menu", route: "/menu" },
+    { id: "pesan", icon: MessageCircle, label: "Pesan", route: "/pesan" },
+    { id: "profil", icon: User, label: "Profil", route: "/profil" },
   ];
 
   return (
     <nav
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`relative h-[750px] bg-[#63714e]/90 backdrop-blur-md rounded-[40px] flex flex-col z-50 shadow-2xl transition-all duration-300 ease-in-out border border-white/10 ${
-        isHovered ? "w-60 px-3" : "w-20 px-0"
+      className={`relative h-full bg-[#63714e]/90 backdrop-blur-md rounded-[30px] flex flex-col z-50 shadow-2xl transition-all duration-300 ease-in-out border border-white/10 ${
+        isHovered ? "w-52 px-3" : "w-16 px-0"
       }`}
     >
-      {/* USER */}
+      {/* USER MINI */}
       <div
-        className={`flex items-center mt-10 mb-12 transition-all duration-300 ${
+        className={`flex items-center mt-6 mb-8 transition-all duration-300 ${
           isHovered
-            ? "bg-[#f8bc22] rounded-full py-2.5 px-4 mx-2"
+            ? "bg-[#f8bc22] rounded-full py-2 px-3 mx-2"
             : "justify-center"
         }`}
       >
         <img
           src={userAvatar}
           alt="User"
-          className="w-10 h-10 rounded-full object-cover ring-2 ring-white/20"
+          className="w-8 h-8 rounded-full object-cover ring-2 ring-white/20"
         />
         {isHovered && (
-          <span className="ml-3 font-bold text-white text-sm whitespace-nowrap">
+          <span className="ml-2 font-bold text-white text-xs whitespace-nowrap">
             Klp 09 PPL
           </span>
         )}
       </div>
 
       {/* MENU */}
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-4">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          // Menggunakan location.pathname agar otomatis mendeteksi halaman aktif
-          const isActive = location.pathname === item.path;
+          const isActive = activePage === item.id;
 
           return (
             <button
               key={item.id}
-              onClick={() => navigate(item.path)}
-              className={`flex items-center h-20 transition-all duration-300 ${
-                isHovered ? "px-4 rounded-full mx-1" : "justify-center"
+              onClick={() => navigate(item.route)}
+              className={`flex items-center h-14 transition-all duration-300 ${
+                isHovered ? "px-3 rounded-full mx-1" : "justify-center"
               } ${
                 isActive
-                  ? "bg-[#f8bc22] shadow-lg scale-110"
+                  ? "bg-[#f8bc22] shadow-lg scale-105"
                   : "hover:bg-white/10"
               }`}
             >
-              <div className="flex items-center justify-center w-10">
+              <div className="flex items-center justify-center w-8">
                 <Icon
-                  size={24}
+                  size={20}
                   className={isActive ? "text-[#63714e]" : "text-white"}
                   strokeWidth={2.5}
                 />
@@ -82,7 +70,7 @@ const SideBar = () => {
 
               {isHovered && (
                 <span
-                  className={`ml-3 font-bold text-sm ${
+                  className={`ml-2 font-bold text-xs ${
                     isActive ? "text-white" : "text-[#f8bc22]"
                   }`}
                 >

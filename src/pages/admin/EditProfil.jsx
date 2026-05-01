@@ -1,29 +1,151 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import SideBar from "../../components/SideBar";
+import SideBarAdmin from "../../components/SideBarAdmin";
+import {
+  Bell,
+  ChevronDown,
+  ArrowLeft,
+  Save,
+  User,
+  Mail,
+  Phone,
+  Store,
+  MapPin,
+  FileText,
+  Camera,
+} from "lucide-react";
 
-import userAvatar from "../../assets/Rectangle.png";
-import peopleImg from "../../assets/people.png";
-import emailImg from "../../assets/email.png";
-import phoneImg from "../../assets/lock.png";
-import tokoImg from "../../assets/toko.png";
+import bgUtama from "../../assets/image.png";
+import userProfil from "../../assets/Rectangle.png";
 
-const EditProfil = () => {
+/* ─── Backdrop ─────────────────────────────────────────────── */
+function Backdrop({ children }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      {children}
+    </div>
+  );
+}
+
+/* ─── Confirm Modal ────────────────────────────────────────── */
+function ConfirmModal({ onClose, onConfirm }) {
+  return (
+    <Backdrop>
+      <div className="bg-white rounded-[28px] shadow-2xl w-80 mx-4 p-7 flex flex-col items-center gap-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-[#f8bc22]/10 flex items-center justify-center">
+          <Save size={28} className="text-[#f8bc22]" />
+        </div>
+        <h2 className="font-black text-[#63714e] text-lg">Simpan Perubahan?</h2>
+        <p className="text-sm text-gray-500 leading-relaxed">
+          Informasi profil admin akan diperbarui. Pastikan semua data sudah
+          benar.
+        </p>
+        <div className="flex gap-3 w-full pt-1">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 transition-colors"
+          >
+            Batal
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="flex-1 py-2.5 rounded-xl bg-[#f8bc22] hover:bg-[#e4aa16] text-white font-black text-sm transition-colors"
+          >
+            Ya, Simpan
+          </button>
+        </div>
+      </div>
+    </Backdrop>
+  );
+}
+
+/* ─── Success Modal ────────────────────────────────────────── */
+function SuccessModal({ onDone }) {
+  return (
+    <Backdrop>
+      <div className="bg-white rounded-[28px] shadow-2xl w-80 mx-4 p-7 flex flex-col items-center gap-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center">
+          <Save size={28} className="text-green-500" />
+        </div>
+        <h2 className="font-black text-[#63714e] text-lg">Profil Disimpan!</h2>
+        <p className="text-sm text-gray-500 leading-relaxed">
+          Informasi profil admin berhasil diperbarui.
+        </p>
+        <button
+          type="button"
+          onClick={onDone}
+          className="w-full py-2.5 rounded-xl bg-[#63714e] hover:bg-[#4f5c3c] text-white font-black text-sm transition-colors"
+        >
+          Selesai
+        </button>
+      </div>
+    </Backdrop>
+  );
+}
+
+/* ─── Input Field ──────────────────────────────────────────── */
+function InputField({ icon, label, name, value, onChange, type = "text" }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs font-bold text-[#63714e]/70 px-1">
+        {label}
+      </label>
+      <div className="bg-[#7d8767] rounded-2xl px-4 py-3 flex items-center gap-3 shadow-inner">
+        <div className="text-white">{icon}</div>
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          className="w-full bg-transparent outline-none text-white text-sm placeholder:text-white/50"
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Textarea Field ───────────────────────────────────────── */
+function TextareaField({ icon, label, name, value, onChange }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs font-bold text-[#63714e]/70 px-1">
+        {label}
+      </label>
+      <div className="bg-[#7d8767] rounded-2xl px-4 py-3 flex items-start gap-3 shadow-inner">
+        <div className="text-white mt-0.5">{icon}</div>
+        <textarea
+          name={name}
+          value={value}
+          onChange={onChange}
+          rows={3}
+          className="w-full bg-transparent outline-none text-white text-sm placeholder:text-white/50 resize-none"
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main Component ───────────────────────────────────────── */
+export const EditProfilAdmin = () => {
   const navigate = useNavigate();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [avatar, setAvatar] = useState(userProfil);
 
-  const [profile, setProfile] = useState({
-    name: "Klp 09 PPL",
-    email: "admin@email.com",
+  const [formData, setFormData] = useState({
+    nama: "Admin PPL",
+    email: "admin.ppl@foodwaste.id",
     phone: "08123456789",
-    store: "Green Grocery",
-    address: "Jl. Sustainability No. 42",
-    desc: "Dedicated to reducing food waste and improving sustainability.",
+    toko: "Food Waste Admin",
+    alamat: "Jl. Sustainability No. 42, Medan",
+    deskripsi:
+      "Dedicated to reducing food waste and improving sustainability across all partner stores.",
   });
 
-  const [avatar, setAvatar] = useState(userAvatar);
-
   const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleImage = (e) => {
@@ -31,163 +153,258 @@ const EditProfil = () => {
     if (file) setAvatar(URL.createObjectURL(file));
   };
 
-  const handleSave = () => {
-    alert("Profil berhasil disimpan 🚀");
-    console.log(profile);
-  };
-
   return (
-    <div className="flex min-h-screen bg-[#effae8]">
+    <main className="relative w-screen h-screen bg-[#effae8] overflow-hidden font-sans">
+      {/* ── Background ── */}
+      <div className="fixed inset-0 z-0 flex w-full h-full pointer-events-none">
+        <img
+          src={bgUtama}
+          alt=""
+          className="w-1/2 h-full object-cover opacity-80"
+        />
+        <img
+          src={bgUtama}
+          alt=""
+          className="w-1/2 h-full object-cover opacity-60"
+        />
+      </div>
 
-      {/* SIDEBAR */}
-      <SideBar activePage="profil" />
+      {/* ── Logo ── */}
+      <header className="absolute top-6 left-12 z-30">
+        <div className="px-7 py-3 bg-[#63714ed1] rounded-tr-2xl rounded-br-2xl rounded-bl-2xl shadow-xl border border-white/20">
+          <h1 className="text-2xl font-black italic tracking-tighter text-white">
+            Food <span className="text-[#eb9f29]">Waste</span>
+          </h1>
+        </div>
+      </header>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 p-6">
+      {/* ── Top-right ── */}
+      <div className="absolute top-6 right-12 flex items-center gap-4 z-30">
+        <button className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all text-[#63714e]">
+          <Bell size={24} strokeWidth={2.5} />
+        </button>
+        <div className="p-0.5 bg-white rounded-full shadow-lg border border-gray-100 overflow-hidden flex items-center gap-2 pr-3">
+          <img
+            src={userProfil}
+            alt=""
+            className="w-9 h-9 rounded-full object-cover"
+          />
+          <span className="text-sm font-bold text-[#63714e]">Admin</span>
+          <ChevronDown size={14} className="text-[#63714e]/60" />
+        </div>
+      </div>
 
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-[#455538]">
-              Edit Profil Admin
-            </h1>
-            <p className="text-sm text-gray-600">
-              Manage your profile and business information
-            </p>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={() => navigate("/profil")}
-              className="px-4 py-2 rounded-full border text-[#455538]"
-            >
-              ← Kembali
-            </button>
-
-            <button
-              onClick={handleSave}
-              className="px-6 py-2 rounded-full bg-[#F8BC22] text-white font-semibold"
-            >
-              Simpan
-            </button>
-          </div>
+      {/* ── Main layout ── */}
+      <div className="absolute top-24 left-12 right-12 bottom-4 flex items-stretch gap-4 z-10 overflow-hidden">
+        {/* Sidebar */}
+        <div className="h-full">
+          <SideBarAdmin activePage="profilAdmin" />
         </div>
 
-        {/* GRID */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        {/* Content */}
+        <section className="flex-1 flex gap-4 overflow-hidden">
+          {/* ── Left — Form ── */}
+          <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+            {/* Page header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-[#63714e]">
+                  Edit Profil Admin
+                </h2>
+                <p className="text-xs text-[#63714e]/70 mt-0.5">
+                  Kelola informasi akun dan bisnis
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => navigate("/admin/profil")}
+                  className="px-5 py-2 rounded-full border border-[#63714e] text-[#63714e] text-sm font-bold flex items-center gap-2 hover:bg-[#63714e]/10 transition-all"
+                >
+                  <ArrowLeft size={15} />
+                  Kembali
+                </button>
+                <button
+                  onClick={() => setShowConfirm(true)}
+                  className="px-5 py-2 rounded-full bg-[#f8bc22] hover:bg-[#e4aa16] text-white font-black text-sm flex items-center gap-2 transition-all shadow-md"
+                >
+                  <Save size={15} />
+                  Simpan
+                </button>
+              </div>
+            </div>
 
-          {/* LEFT FORM */}
-          <section className="lg:col-span-2 space-y-6">
+            {/* Scrollable form area */}
+            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+              {/* ─ Informasi Akun ─ */}
+              <div className="bg-white/60 backdrop-blur-2xl rounded-[28px] shadow-2xl border border-white/40 px-7 py-6">
+                <h3 className="text-sm font-black text-[#63714e] mb-5">
+                  Informasi Akun
+                </h3>
 
-            {/* PROFILE CARD */}
-            <div className="bg-white/80 rounded-3xl p-6 shadow">
+                {/* Avatar */}
+                <div className="flex items-center gap-5 mb-5">
+                  <div className="relative">
+                    <img
+                      src={avatar}
+                      alt="Admin"
+                      className="w-20 h-20 rounded-2xl object-cover shadow-md border-4 border-white"
+                    />
+                    <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-[#f8bc22] rounded-full flex items-center justify-center cursor-pointer shadow-md hover:bg-[#e4aa16] transition-colors">
+                      <Camera size={14} className="text-white" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={handleImage}
+                      />
+                    </label>
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-[#63714e]">
+                      Foto Profil Admin
+                    </p>
+                    <p className="text-[10px] text-[#63714e]/60 mt-0.5">
+                      Klik ikon kamera untuk mengganti foto
+                    </p>
+                  </div>
+                </div>
 
-              <h2 className="font-bold text-[#455538] mb-4">
-                Informasi Akun
-              </h2>
+                <div className="grid grid-cols-2 gap-3">
+                  <InputField
+                    icon={<User size={15} />}
+                    label="Nama Admin"
+                    name="nama"
+                    value={formData.nama}
+                    onChange={handleChange}
+                  />
+                  <InputField
+                    icon={<Mail size={15} />}
+                    label="Email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    type="email"
+                  />
+                  <div className="col-span-2 md:col-span-1">
+                    <InputField
+                      icon={<Phone size={15} />}
+                      label="No. Telepon"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+              </div>
 
-              {/* AVATAR */}
-              <div className="flex items-center gap-4 mb-6">
+              {/* ─ Informasi Bisnis ─ */}
+              <div className="bg-white/60 backdrop-blur-2xl rounded-[28px] shadow-2xl border border-white/40 px-7 py-6">
+                <h3 className="text-sm font-black text-[#63714e] mb-5">
+                  Informasi Bisnis
+                </h3>
+
+                <div className="space-y-3">
+                  <InputField
+                    icon={<Store size={15} />}
+                    label="Nama Toko"
+                    name="toko"
+                    value={formData.toko}
+                    onChange={handleChange}
+                  />
+                  <InputField
+                    icon={<MapPin size={15} />}
+                    label="Alamat Toko"
+                    name="alamat"
+                    value={formData.alamat}
+                    onChange={handleChange}
+                  />
+                  <TextareaField
+                    icon={<FileText size={15} />}
+                    label="Deskripsi Bisnis"
+                    name="deskripsi"
+                    value={formData.deskripsi}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Right — Live Preview ── */}
+          <div className="w-64 bg-white/55 backdrop-blur-2xl rounded-[28px] shadow-2xl border border-white/40 px-6 py-6 flex flex-col overflow-hidden">
+            <h3 className="text-sm font-black text-[#63714e] mb-5">
+              Live Preview
+            </h3>
+
+            {/* Avatar preview */}
+            <div className="flex flex-col items-center text-center mb-5">
+              <div className="relative mb-3">
                 <img
                   src={avatar}
-                  className="w-24 h-24 rounded-2xl border-4 border-white shadow"
+                  alt="Preview"
+                  className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
                 />
-
-                <label className="text-blue-600 text-sm cursor-pointer">
-                  Ganti Foto
-                  <input type="file" hidden onChange={handleImage} />
-                </label>
+                <span className="absolute -bottom-1 -right-1 bg-[#f8bc22] text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">
+                  ADMIN
+                </span>
               </div>
-
-              {/* INPUT GRID */}
-              <div className="grid md:grid-cols-2 gap-4">
-
-                <Input icon={peopleImg} name="name" value={profile.name} onChange={handleChange} placeholder="Nama" />
-                <Input icon={emailImg} name="email" value={profile.email} onChange={handleChange} placeholder="Email" />
-                <Input icon={phoneImg} name="phone" value={profile.phone} onChange={handleChange} placeholder="No HP" />
-
-              </div>
-            </div>
-
-            {/* BUSINESS CARD */}
-            <div className="bg-white/80 rounded-3xl p-6 shadow">
-
-              <h2 className="font-bold text-[#455538] mb-4">
-                Informasi Bisnis
-              </h2>
-
-              <div className="space-y-4">
-
-                <Input icon={tokoImg} name="store" value={profile.store} onChange={handleChange} placeholder="Nama Toko" />
-
-                <Input icon={tokoImg} name="address" value={profile.address} onChange={handleChange} placeholder="Alamat Toko" />
-
-                <textarea
-                  name="desc"
-                  value={profile.desc}
-                  onChange={handleChange}
-                  rows="4"
-                  className="w-full p-4 rounded-2xl bg-[#63714ecc] text-white outline-none"
-                  placeholder="Deskripsi bisnis"
-                />
-
-              </div>
-            </div>
-
-          </section>
-
-          {/* RIGHT PREVIEW */}
-          <aside className="bg-white/80 rounded-3xl p-6 shadow h-fit">
-
-            <h2 className="font-bold text-[#455538] mb-4">
-              Live Preview
-            </h2>
-
-            <div className="text-center">
-
-              <img
-                src={avatar}
-                className="w-20 h-20 mx-auto rounded-full border mb-3"
-              />
-
-              <h3 className="font-bold text-[#455538]">
-                {profile.name}
-              </h3>
-
-              <p className="text-sm text-gray-600">
-                {profile.email}
+              <h4 className="text-base font-black text-[#63714e] leading-tight">
+                {formData.nama || "—"}
+              </h4>
+              <p className="text-[10px] text-[#63714e]/60 mt-0.5">
+                {formData.email || "—"}
               </p>
+              <p className="text-[10px] text-[#63714e]/60">
+                {formData.phone || "—"}
+              </p>
+            </div>
 
-              <div className="mt-4 text-xs text-gray-500 space-y-1">
-                <p>🏪 {profile.store}</p>
-                <p>📍 {profile.address}</p>
-                <p>📞 {profile.phone}</p>
+            {/* Divider */}
+            <div className="border-t border-gray-100 pt-4 space-y-2.5 flex-1 overflow-y-auto">
+              <div className="flex items-start gap-2">
+                <Store size={12} className="text-[#f8bc22] mt-0.5" />
+                <p className="text-[10px] text-[#63714e] font-semibold leading-tight">
+                  {formData.toko || "—"}
+                </p>
               </div>
-
+              <div className="flex items-start gap-2">
+                <MapPin size={12} className="text-[#f8bc22] mt-0.5" />
+                <p className="text-[10px] text-[#63714e]/70 leading-tight">
+                  {formData.alamat || "—"}
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <FileText size={12} className="text-[#f8bc22] mt-0.5" />
+                <p className="text-[10px] text-[#63714e]/70 leading-tight line-clamp-4">
+                  {formData.deskripsi || "—"}
+                </p>
+              </div>
             </div>
 
-            <div className="mt-6 p-3 bg-[#eef26b]/40 rounded-xl text-xs text-[#455538]">
-              Live preview update otomatis saat kamu edit form
+            {/* Hint */}
+            <div className="mt-4 px-3 py-2.5 bg-[#f8bc22]/10 rounded-xl">
+              <p className="text-[9px] text-[#63714e]/70 font-semibold text-center leading-relaxed">
+                Preview diperbarui otomatis saat kamu mengedit form
+              </p>
             </div>
+          </div>
+        </section>
+      </div>
 
-          </aside>
+      {/* ── Modals ── */}
+      {showConfirm && (
+        <ConfirmModal
+          onClose={() => setShowConfirm(false)}
+          onConfirm={() => {
+            setShowConfirm(false);
+            setShowSuccess(true);
+          }}
+        />
+      )}
 
-        </div>
-
-      </main>
-    </div>
+      {showSuccess && <SuccessModal onDone={() => navigate("/admin/profil")} />}
+    </main>
   );
 };
 
-/* INPUT COMPONENT */
-const Input = ({ icon, ...props }) => (
-  <div className="flex items-center gap-3 bg-[#63714ecc] text-white p-4 rounded-2xl">
-    <img src={icon} className="w-5 h-5" />
-    <input
-      {...props}
-      className="bg-transparent w-full outline-none text-white"
-    />
-  </div>
-);
-
-export default EditProfil;
+export default EditProfilAdmin;
