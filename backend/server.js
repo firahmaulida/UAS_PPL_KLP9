@@ -31,6 +31,9 @@ db.connect((err) => {
   }
 });
 
+const produkRoutes = require('./routes/produk');
+app.use('/api/produk', produkRoutes);
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error('🔥 ERROR SERVER:', err.stack);
@@ -49,3 +52,4 @@ app.listen(PORT, () => {
   console.log(`📝 Register: POST http://localhost:${PORT}/api/register`);
   console.log(`🔐 Login: POST http://localhost:${PORT}/api/login`);
 });
+
