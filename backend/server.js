@@ -18,9 +18,11 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'API OK' });
 });
 
-// Routes - PASTIKAN INI
+// Routes 
 const authRoutes = require('./routes/auth');
-app.use('/api', authRoutes);  // 👈 Ini yang membuat endpoint menjadi /api/login dan /api/register
+const productRoutes = require('./routes/productRoutes');
+app.use('/api', authRoutes); 
+app.use('/api', productRoutes); 
 
 // Cek koneksi database
 db.connect((err) => {
