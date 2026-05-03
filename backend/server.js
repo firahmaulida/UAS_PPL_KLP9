@@ -21,8 +21,11 @@ app.get('/api/test', (req, res) => {
 // Routes 
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/productRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+
 app.use('/api', authRoutes); 
 app.use('/api', productRoutes); 
+app.use('/api', chatRoutes);
 
 // Cek koneksi database
 db.connect((err) => {
