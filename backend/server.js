@@ -1,12 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./db');
+const path = require("path");
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Test API
 app.get('/', (req, res) => {
@@ -52,4 +55,3 @@ app.listen(PORT, () => {
   console.log(`📝 Register: POST http://localhost:${PORT}/api/register`);
   console.log(`🔐 Login: POST http://localhost:${PORT}/api/login`);
 });
-
