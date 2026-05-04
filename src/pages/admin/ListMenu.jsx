@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Search,
   Bell,
@@ -142,7 +142,10 @@ const emptyForm = {
 
 /* ─── MenuCard ─────────────────────────────────────────────── */
 function MenuCard({ item, onDelete, onEdit }) {
-  const imgSrc = menuImages[item.image] ?? menuImages["donat gula"];
+  const imgSrc =
+  item.image
+    ? `http://localhost:3000/uploads/${item.image}`
+    : menuImages[item.image] ?? menuImages["donat gula"];
 
   return (
     <article className="bg-white/75 backdrop-blur-sm rounded-[22px] shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col">
@@ -166,12 +169,20 @@ function MenuCard({ item, onDelete, onEdit }) {
         <p className="text-[10px] text-gray-500 leading-tight">{item.store}</p>
 
         <div className="flex items-center gap-1 mt-0.5">
-          <span className="text-[10px] text-gray-400 line-through">
-            {item.price}
-          </span>
-          <span className="text-xs font-black text-[#f8bc22]">
-            {item.salePrice}
-          </span>
+          {item.salePrice ? (
+            <>
+              <span className="text-[10px] text-gray-400 line-through">
+                {item.price}
+              </span>
+              <span className="text-xs font-black text-[#f8bc22]">
+                {item.salePrice}
+              </span>
+            </>
+          ) : (
+            <span className="text-xs font-black text-[#f8bc22]">
+              {item.price}
+            </span>
+          )}
         </div>
 
         <p className="text-[10px] text-[#63714e]/70 italic">{item.expiry}</p>
@@ -358,7 +369,7 @@ function DeleteModal({ item, onClose, onConfirm }) {
           </button>
           <button
             type="button"
-            onClick={() => onConfirm(item.id)}
+            onClick={() => onConfirm(item.id_produk)}
             className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-black text-sm transition-colors"
           >
             Hapus
@@ -530,6 +541,33 @@ export function ListMenuAdmin() {
   const [form, setForm] = useState(emptyForm);
   const [imagePreview, setImagePreview] = useState("");
 
+  useEffect(() => {
+  fetch("http://localhost:3000/api/produk")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("DATA BACKEND:", data);
+
+      const mapped = data.map((item) => ({
+        id_produk: item.id_produk,
+        name: item.nama_produk,
+        price: "Rp. " + item.harga,
+        salePrice:
+        item.harga_diskon !== null && item.harga_diskon !== undefined
+          ? "Rp. " + item.harga_diskon
+          : null,
+        description: item.deskripsi,
+        store: item.nama_toko || "No Store",
+        status: getStatus(item.expired_date),   // 🔥 PAKAI FUNCTION
+          expiredDate: item.expired_date,         // 🔥 SIMPAN
+          image: item.image || null,
+          expiry: getExpiryText(item.expired_date),
+      }));
+
+      setMenuCards(mapped);
+    })
+    .catch((err) => console.error(err));
+}, []);
+
   /* Form handlers */
   const handleFormChange = (field, value) => {
     if (field === "image") {
@@ -546,14 +584,81 @@ export function ListMenuAdmin() {
     setImagePreview("");
   };
 
-  const handleAddMenu = (e) => {
-    e.preventDefault();
-    closeAdd();
+    const handleAddMenu = async (e) => {
+      e.preventDefault();
+
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+
+  const formData = new FormData();
+
+  formData.append("nama_produk", form.name);
+  formData.append("harga", parseInt(form.price.replace(/\D/g, "")) || 0);
+  formData.append("harga_diskon", parseInt((form.discountPrice || "").replace(/\D/g, "")) || null);
+  formData.append("deskripsi", form.description);
+  formData.append("expired_date", form.expiredDate);
+  formData.append("id_toko", user?.id || "");
+
+  // 🔥 INI YANG PALING PENTING
+    if (form.image) {
+    formData.append("image", form.image);
+  }
+
+  const res = await fetch("http://localhost:3000/api/produk", {
+    method: "POST",
+    body: formData, // ❗ TANPA headers
+  });
+
+      const data = await res.json();
+      console.log("ADD:", data);
+
+      // 🔥 reload data dari backend
+      const refreshed = await fetch("http://localhost:3000/api/produk")
+        .then((res) => res.json());
+
+      const mapped = refreshed.map((item) => ({
+        id_produk: item.id_produk,
+        name: item.nama_produk,
+        price: "Rp. " + item.harga,
+          salePrice:
+        item.harga_diskon !== null && item.harga_diskon !== undefined
+          ? "Rp. " + item.harga_diskon
+          : null,
+        description: item.deskripsi,
+        store: item.nama_toko || "No Store",
+        status: getStatus(item.expired_date), expiredDate: item.expired_date,
+        image: item.image || null,
+        expiry: getExpiryText(item.expired_date),
+      }));
+
+      setMenuCards(mapped);
+
+      closeAdd();
+
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menambahkan produk");
+    }
   };
 
-  const handleDeleteMenu = (id) => {
-    setMenuCards((c) => c.filter((item) => item.id !== id));
-    setDeleteTarget(null);
+  const handleDeleteMenu = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/produk/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+      console.log(data);
+
+      // 🔥 update UI
+      setMenuCards((c) => c.filter((item) => item.id_produk !== id));
+
+      setDeleteTarget(null);
+
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menghapus produk");
+    }
   };
 
   const openEdit = (item) => {
@@ -567,17 +672,23 @@ export function ListMenuAdmin() {
       salePrice: item.salePrice,
       image: "",
     });
-    setEditImagePreview(menuImages[item.image] ?? menuImages["donat gula"]);
+      setEditImagePreview(
+      item.image
+        ? `http://localhost:3000/uploads/${item.image}`
+        : menuImages["donat gula"]
+    );
   };
 
   const handleEditFormChange = (field, value) => {
     if (field === "image") {
       setEditForm((f) => ({ ...f, image: value }));
-      setEditImagePreview(
-        value
-          ? URL.createObjectURL(value)
-          : (menuImages[editTarget?.image] ?? menuImages["donat gula"]),
-      );
+    setEditImagePreview(
+      value
+        ? URL.createObjectURL(value)
+        : editTarget?.image
+          ? `http://localhost:3000/uploads/${editTarget.image}`
+          : menuImages["donat gula"]
+    );
       return;
     }
     setEditForm((f) => ({ ...f, [field]: value }));
@@ -589,14 +700,68 @@ export function ListMenuAdmin() {
     setEditImagePreview("");
   };
 
-  const handleEditMenu = (e) => {
+  const handleEditMenu = async (e) => {
     e.preventDefault();
-    setMenuCards((c) =>
-      c.map((item) =>
-        item.id === editTarget.id ? { ...item, ...editForm } : item,
-      ),
-    );
-    closeEdit();
+
+    try {
+      const formData = new FormData();
+
+      formData.append("nama_produk", editForm.name);
+      formData.append(
+        "harga",
+        parseInt((editForm.price || "").replace(/\D/g, "")) || 0
+      );
+      formData.append(
+        "harga_diskon",
+        parseInt((editForm.salePrice || "").replace(/\D/g, "")) || null
+      );
+      formData.append("deskripsi", editForm.description);
+      formData.append("expired_date", editForm.expiredDate);
+
+      // ✅ hanya kirim image kalau ada file baru
+      if (editForm.image) {
+        formData.append("image", editForm.image);
+      }
+
+      const res = await fetch(
+        `http://localhost:3000/api/produk/${editTarget.id_produk}`,
+        {
+          method: "PUT",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      console.log("UPDATE:", data);
+
+      // 🔥 reload data biar sinkron backend
+      const refreshed = await fetch("http://localhost:3000/api/produk")
+        .then((res) => res.json());
+
+      const mapped = refreshed.map((item) => ({
+        id_produk: item.id_produk,
+        name: item.nama_produk,
+        price: "Rp. " + item.harga,
+        salePrice:
+        item.harga_diskon !== null && item.harga_diskon !== undefined
+          ? "Rp. " + item.harga_diskon
+          : null,
+        description: item.deskripsi,
+        store: item.nama_toko || "No Store",
+        status: getStatus(item.expired_date),
+        expiredDate: item.expired_date,
+        image: item.image || null,
+        expiry: getExpiryText(item.expired_date),
+      }));
+
+      setMenuCards(mapped);
+
+      closeEdit();
+
+    } catch (err) {
+      console.error(err);
+      alert("Gagal update produk");
+    }
   };
 
   const filteredMenus = useMemo(() => {
@@ -708,7 +873,7 @@ export function ListMenuAdmin() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 pb-4">
             {filteredMenus.map((item) => (
               <MenuCard
-                key={item.id}
+                key={item.id_produk}
                 item={item}
                 onDelete={setDeleteTarget}
                 onEdit={openEdit}
@@ -775,4 +940,34 @@ function FilterSelect({ label, value, onChange, options }) {
   );
 }
 
+const getStatus = (expiredDate) => {
+  if (!expiredDate) return "Available";
+
+  const today = new Date();
+  const exp = new Date(expiredDate);
+
+  const diffTime = exp - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) return "Expired";
+  if (diffDays <= 2) return "Almost Expired";
+
+  return "Available";
+};
+
+const getExpiryText = (expiredDate) => {
+  if (!expiredDate) return "";
+
+  const today = new Date();
+  const exp = new Date(expiredDate);
+
+  const diffTime = exp - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) return "Expired";
+  return `Exp. ${diffDays} hari lagi`;
+};
+
 export default ListMenuAdmin;
+
+

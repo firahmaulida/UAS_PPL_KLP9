@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Bell,
@@ -129,17 +129,34 @@ const ActivityIcon = ({ tone }) => {
 export function DashboardAdmin() {
   const [search, setSearch] = useState("");
   const [showNotif, setShowNotif] = useState(false);
+  const [produk, setProduk] = useState([]);
+  useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (!user || !user.id) {
+    console.log("User tidak valid:", user);
+    return;
+  }
+
+  fetch(`http://localhost:3000/api/produk/toko/${user.id}`)
+    .then((res) => res.json())
+    .then((data) => setProduk(data))
+    .catch((err) => console.error(err));
+}, []);
   const notifRef = useRef(null);
 
   const filteredMenu = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return menuItems;
-    return menuItems.filter((item) =>
-      [item.name, item.store, item.status].some((v) =>
-        v.toLowerCase().includes(query),
-      ),
+
+    if (!query) return produk;
+
+    return produk.filter((item) =>
+      [item.nama_produk, item.deskripsi, item.status, item.nama_toko]
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
     );
-  }, [search]);
+  }, [search, produk]);
 
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-[#effae8] font-sans">
@@ -260,35 +277,45 @@ export function DashboardAdmin() {
                 Expiring Menu List
               </h3>
               <div className="grid grid-cols-3 gap-3">
-                {filteredMenu.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white rounded-[20px] shadow-md hover:shadow-xl hover:-translate-y-1 transition-all p-2.5"
-                  >
-                    <img
-                      src={menuImages[item.image] ?? menuImages["donat gula"]}
-                      alt={item.name}
-                      className="w-full h-24 object-cover rounded-xl"
-                    />
-                    <div className="mt-2 flex items-center justify-between">
-                      <h4 className="font-bold text-[#63714e] text-sm">
-                        {item.name}
-                      </h4>
-                      <span
-                        className={`text-[9px] text-white font-bold px-2 py-0.5 rounded-full ${statusColor[item.status]}`}
-                      >
-                        {item.status}
-                      </span>
+                  {filteredMenu.map((item) => (
+                    <div
+                      key={item.id_produk}
+                      className="bg-white rounded-[20px] shadow-md hover:shadow-xl hover:-translate-y-1 transition-all p-2.5"
+                    >
+                      <img
+                        src={
+                          menuImages[item.nama_produk.toLowerCase()] ??
+                          menuImages["donat gula"]
+                        }
+                        alt={item.nama_produk}
+                        className="w-full h-24 object-cover rounded-xl"
+                      />
+
+                      <div className="mt-2 flex items-center justify-between">
+                        <h4 className="font-bold text-[#63714e] text-sm">
+                          {item.nama_produk}
+                        </h4>
+
+                        <span
+                          className={`text-[9px] text-white font-bold px-2 py-0.5 rounded-full ${
+                            item.status === "expired"
+                              ? "bg-red-500"
+                              : "bg-green-500"
+                          }`}
+                        >
+                          {item.status === "expired" ? "Expired" : "Available"}
+                        </span>
+                      </div>
+
+                      <p className="text-[10px] text-gray-500">
+                        {item.deskripsi}
+                      </p>
+
+                      <p className="text-xs text-[#63714e] mt-1 font-bold">
+                        Rp. {item.harga}
+                      </p>
                     </div>
-                    <p className="text-[10px] text-gray-500">{item.store}</p>
-                    <p className="text-xs text-[#63714e] mt-1">
-                      <span className="line-through text-gray-400">
-                        {item.oldPrice}
-                      </span>
-                      <span className="font-bold ml-1">{item.newPrice}</span>
-                    </p>
-                  </div>
-                ))}
+                  ))}
                 {filteredMenu.length === 0 && (
                   <div className="col-span-3 text-center text-[#63714e]/50 py-8 text-sm">
                     Menu tidak ditemukan.

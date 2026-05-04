@@ -1,12 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./db');
+const path = require("path");
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Test API
 app.get('/', (req, res) => {
@@ -35,6 +38,12 @@ db.connect((err) => {
     console.log('✅ Berhasil konek ke MySQL');
   }
 });
+
+const produkRoutes = require('./routes/produk');
+app.use('/api/produk', produkRoutes);
+
+const chatRoutes = require('./routes/chat');
+app.use('/api/chat', chatRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {

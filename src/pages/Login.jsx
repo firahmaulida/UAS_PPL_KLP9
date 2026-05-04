@@ -73,6 +73,7 @@ export const Login = () => {
         storage.setItem('token', data.token);
         storage.setItem('userRole', data.user.role);
         storage.setItem('userData', JSON.stringify(data.user));
+        localStorage.setItem('user', JSON.stringify(data.user));
         
         // Redirect
         if (data.user.role === "admin") {

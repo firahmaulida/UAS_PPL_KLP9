@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useEffect } from "react";
 import {
   Bell,
   Search,
@@ -15,86 +17,83 @@ import userProfil from "../../assets/Rectangle.png";
 import chat1 from "../../assets/image.png";
 
 /* ─── Dummy data ───────────────────────────────────────────── */
-const conversations = [
-  {
-    id: 1,
-    name: "Firah Maulida",
-    msg: "Terima kasih kak sudah order!",
-    time: "10 m ago",
-    img: chat1,
-    role: "Pembeli",
-    messages: [
-      {
-        from: "them",
-        text: "Halo Admin, stok Donat Gula hari ini sisa 3 kak.",
-      },
-      { from: "me", text: "Oke, sudah diupdate di sistem ya, terima kasih!" },
-      { from: "them", text: "Siap Admin, terima kasih kak <3" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Rasya Tazkiya",
-    msg: "Brownies mau kita diskon 50%",
-    time: "1 j ago",
-    img: chat1,
-    role: "Pembeli",
-    messages: [
-      {
-        from: "them",
-        text: "Admin, boleh kami turunkan harga Brownies jadi 50%?",
-      },
-      { from: "me", text: "Boleh, silakan update melalui halaman List Menu." },
-    ],
-  },
-  {
-    id: 3,
-    name: "Caesar",
-    msg: "Menu kami sudah diperpanjang",
-    time: "2 j ago",
-    img: chat1,
-    role: "Pembeli",
-    messages: [
-      {
-        from: "them",
-        text: "Admin, expired date Soto Ayam sudah kami perpanjang.",
-      },
-      { from: "me", text: "Baik, kami sudah melihat perubahan di sistem." },
-      { from: "them", text: "Terima kasih Admin!" },
-    ],
-  },
-];
 
 /* ─── Main Component ───────────────────────────────────────── */
 export const PesanAdmin = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [inputText, setInputText] = useState("");
-  const [allConversations, setAllConversations] = useState(conversations);
+  const [allConversations, setAllConversations] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/chat")
+      .then((res) => {
+        console.log("DATA API:", res.data);
+
+        const data = res.data.map((item) => ({
+          id: item.id,
+          name: item.nama || "User",
+          msg: item.last_message || "Belum ada pesan",
+          time: item.last_time
+            ? new Date(item.last_time).toLocaleTimeString()
+            : "",
+          img: chat1,
+          role: "Pembeli",
+          messages: [],
+        }));
+
+        console.log("SET DATA:", data);
+
+        setAllConversations(data);
+      })
+      .catch((err) => {
+        console.error("Gagal ambil chat:", err);
+      });
+  }, []);
 
   const activeChat = allConversations.find((c) => c.id === selectedId);
 
-  const filtered = allConversations.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      c.msg.toLowerCase().includes(searchValue.toLowerCase()),
+  const filtered = allConversations;
+
+    const sendMessage = async () => {
+  if (!inputText.trim() || !selectedId) return;
+
+  try {
+    const text = inputText; // 🔥 simpan dulu
+
+  await axios.post("http://localhost:3000/api/chat", {
+    chat_id: selectedId,
+    sender_id: 16,
+    message: text,
+  });
+
+  setInputText("");
+
+  const res = await axios.get(
+    `http://localhost:3000/api/chat/${selectedId}`
   );
 
-  const sendMessage = () => {
-    if (!inputText.trim() || !selectedId) return;
-    setAllConversations((prev) =>
-      prev.map((c) =>
-        c.id === selectedId
-          ? {
-              ...c,
-              msg: inputText,
-              messages: [...c.messages, { from: "me", text: inputText }],
-            }
-          : c,
-      ),
-    );
-    setInputText("");
-  };
+  const msgs = res.data.map((m) => ({
+    from: m.sender_id === 16 ? "me" : "them",
+    text: m.message,
+  }));
+
+  setAllConversations((prev) =>
+  prev.map((c) =>
+    c.id === selectedId
+      ? {
+          ...c,
+          messages: msgs,
+          msg: text,
+        }
+      : c
+  )
+);
+
+  } catch (err) {
+    console.error("Gagal kirim pesan:", err);
+  }
+};
 
   return (
     <main className="relative w-screen h-screen bg-[#effae8] overflow-hidden font-sans">
@@ -168,7 +167,29 @@ export const PesanAdmin = () => {
             {filtered.map((c) => (
               <button
                 key={c.id}
-                onClick={() => setSelectedId(c.id)}
+                onClick={() => {
+                      setSelectedId(c.id);
+
+                      axios.get(`http://localhost:3000/api/chat/${c.id}`)
+                        .then((res) => {
+                          const msgs = res.data.map((m) => ({
+                            from: m.sender_id === 16 ? "me" : "them",
+                            text: m.message,
+                          }));
+
+                          setAllConversations((prev) => {
+                            return prev.map((item) => {
+                              if (item.id === c.id) {
+                                return {
+                                  ...item,
+                                  messages: msgs,
+                                };
+                              }
+                              return item;
+                            });
+                          });
+                        });
+                    }}
                 className={`w-full flex items-center gap-3 p-3 rounded-[20px] transition-all border-2 text-left ${
                   selectedId === c.id
                     ? "bg-white border-[#f8bc22] shadow-md scale-[1.01]"
@@ -326,5 +347,7 @@ export const PesanAdmin = () => {
     </main>
   );
 };
+
+
 
 export default PesanAdmin;
