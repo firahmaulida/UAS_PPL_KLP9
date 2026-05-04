@@ -20,7 +20,7 @@ import { EditProfil } from "./pages/user/EditProfil";
 import { GantiPassword } from "./pages/user/GantiPassword";
 import { Pengaturan } from "./pages/user/Pengaturan";
 import { DashboardUser } from "./pages/user/DashboardUser"; // Dari Kiya // Dari Shania (HEAD)
-import { ListMenu } from "./pages/user/ListMenu";
+import ListMenu from "./pages/user/ListMenu";
 import { MerchantMenu } from "./pages/user/MerchantMenu"; // Dari Kiya
 
 function App() {

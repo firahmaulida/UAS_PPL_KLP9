@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SideBar from "../../components/SideBar";
 import LogoutModal from "../../components/LogoutModal";
@@ -18,6 +18,7 @@ import food1 from "../../assets/chat1.png";
 
 export const ProfilUser = () => {
   const [showLogout, setShowLogout] = useState(false);
+  const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
 
   const riwayatPesanan = [
@@ -29,9 +30,22 @@ export const ProfilUser = () => {
     },
   ];
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    fetch(`http://localhost:3000/api/profile/${user.id}`)
+      .then((res) => res.json())
+      .then((data) => setUserData(data))
+      .catch((err) => console.log(err));
+  }, [navigate]);
+
   return (
     <main className="relative w-screen h-screen bg-[#effae8] overflow-hidden font-sans">
-      {/* BACKGROUND */}
       <div className="fixed inset-0 z-0 flex w-full h-full pointer-events-none">
         <img
           className="w-1/2 h-full object-cover opacity-80"
@@ -45,7 +59,6 @@ export const ProfilUser = () => {
         />
       </div>
 
-      {/* LOGO */}
       <header className="absolute top-6 left-12 z-30">
         <div className="px-7 py-3 bg-[#63714ed1] rounded-tr-2xl rounded-br-2xl rounded-bl-2xl shadow-xl border border-white/20">
           <h1 className="text-2xl font-black italic tracking-tighter text-white">
@@ -54,55 +67,58 @@ export const ProfilUser = () => {
         </div>
       </header>
 
-      {/* TOP RIGHT */}
       <div className="absolute top-6 right-12 flex items-center gap-6 z-30">
-        <button className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all text-[#63714e]">
+        <button className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg text-[#63714e]">
           <Bell size={24} strokeWidth={2.5} />
         </button>
-        <div className="p-0.5 bg-white rounded-full shadow-lg border border-gray-100 overflow-hidden">
+        <div className="p-0.5 bg-white rounded-full shadow-lg overflow-hidden">
           <img
-            src={userProfil}
-            alt="User"
+            src={
+              userData?.foto
+                ? `http://localhost:3000/uploads/${userData.foto}`
+                : userProfil
+            }
+            alt=""
             className="w-12 h-12 rounded-full object-cover"
           />
         </div>
       </div>
 
-      {/* MAIN LAYOUT - sama persis struktur PesanUser */}
       <div className="absolute top-24 left-12 right-12 bottom-10 flex items-stretch gap-8 z-10">
-        {/* SIDEBAR */}
         <div className="h-full">
           <SideBar activePage="profil" />
         </div>
 
-        {/* CONTENT */}
         <section className="flex-1 flex gap-6 overflow-hidden">
-          {/* LEFT PANEL */}
           <div className="flex-1 flex flex-col gap-4 overflow-hidden">
-            {/* IDENTITAS */}
             <div className="bg-white/60 backdrop-blur-2xl rounded-[38px] shadow-2xl border border-white/40 px-8 py-5 flex items-center gap-6">
               <img
-                src={userProfil}
-                alt="User"
+                src={
+                  userData?.foto
+                    ? `http://localhost:3000/uploads/${userData.foto}`
+                    : userProfil
+                }
+                alt=""
                 className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
               />
               <div>
                 <h2 className="text-3xl font-black text-[#63714e] leading-none">
-                  KLP 09 PPL
+                  {userData?.nama_lengkap || "Loading..."}
                 </h2>
                 <p className="text-base text-[#63714e]/75 font-medium mt-1">
-                  klp09.ppl@gmail.com
+                  {userData?.email || "-"}
+                </p>
+                <p className="text-sm text-[#63714e]/70 mt-1">
+                  {userData?.no_telp || "-"}
                 </p>
               </div>
             </div>
 
-            {/* MENU PROFIL */}
             <div className="flex-1 bg-white/55 backdrop-blur-2xl rounded-[38px] shadow-2xl border border-white/40 px-8 py-6 flex flex-col justify-between overflow-hidden">
               <div className="space-y-4">
-                {/* EDIT PROFIL */}
                 <button
                   onClick={() => navigate("/editprofil")}
-                  className="w-full flex items-center justify-between border-b border-gray-200 pb-4 hover:translate-x-1 transition-all"
+                  className="w-full flex items-center justify-between border-b border-gray-200 pb-4"
                 >
                   <div className="flex items-center gap-4">
                     <User size={18} className="text-[#f8bc22]" />
@@ -113,10 +129,9 @@ export const ProfilUser = () => {
                   <ChevronRight className="text-[#f8bc22]" size={17} />
                 </button>
 
-                {/* GANTI PASSWORD */}
                 <button
                   onClick={() => navigate("/gantipassword")}
-                  className="w-full flex items-center justify-between border-b border-gray-200 pb-4 hover:translate-x-1 transition-all"
+                  className="w-full flex items-center justify-between border-b border-gray-200 pb-4"
                 >
                   <div className="flex items-center gap-4">
                     <Lock size={18} className="text-[#f8bc22]" />
@@ -127,25 +142,23 @@ export const ProfilUser = () => {
                   <ChevronRight className="text-[#f8bc22]" size={17} />
                 </button>
 
-                {/* PENGATURAN */}
                 <button
                   onClick={() => navigate("/pengaturan")}
-                  className="w-full flex items-center justify-between border-b border-gray-200 pb-4 hover:translate-x-1 transition-all"
+                  className="w-full flex items-center justify-between border-b border-gray-200 pb-4"
                 >
                   <div className="flex items-center gap-4">
                     <Settings size={18} className="text-[#f8bc22]" />
                     <span className="font-semibold text-[#63714e] text-base">
-                      Pengaturan
+                      F.A.Q
                     </span>
                   </div>
                   <ChevronRight className="text-[#f8bc22]" size={17} />
                 </button>
               </div>
 
-              {/* LOGOUT */}
               <button
                 onClick={() => setShowLogout(true)}
-                className="w-full bg-[#f8bc22] hover:bg-[#e4aa16] text-white font-bold py-3 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-all"
+                className="w-full bg-[#f8bc22] text-white font-bold py-3 rounded-2xl shadow-lg flex items-center justify-center gap-3"
               >
                 <LogOut size={18} />
                 Keluar
@@ -153,7 +166,6 @@ export const ProfilUser = () => {
             </div>
           </div>
 
-          {/* RIGHT PANEL */}
           <div className="w-72 bg-white/55 backdrop-blur-2xl rounded-[38px] shadow-2xl border border-white/40 px-6 py-6 overflow-y-auto">
             <div className="flex items-center gap-3 mb-5">
               <ClipboardList className="text-[#63714e]" size={19} />
@@ -162,41 +174,35 @@ export const ProfilUser = () => {
               </h3>
             </div>
 
-            {riwayatPesanan.length > 0 ? (
-              <div className="space-y-4">
-                {riwayatPesanan.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white/80 rounded-3xl p-3 flex items-center gap-3 shadow-md hover:scale-[1.02] transition-all"
-                  >
-                    <img
-                      src={item.img}
-                      alt={item.nama}
-                      className="w-14 h-14 rounded-2xl object-cover"
-                    />
-                    <div>
-                      <h4 className="font-bold text-[#63714e] text-sm">
-                        {item.nama}
-                      </h4>
-                      <p className="text-xs text-gray-500 mt-1">{item.toko}</p>
-                    </div>
-                  </div>
-                ))}
+            {riwayatPesanan.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white/80 rounded-3xl p-3 flex items-center gap-3 shadow-md mb-4"
+              >
+                <img
+                  src={item.img}
+                  alt=""
+                  className="w-14 h-14 rounded-2xl object-cover"
+                />
+                <div>
+                  <h4 className="font-bold text-[#63714e] text-sm">
+                    {item.nama}
+                  </h4>
+                  <p className="text-xs text-gray-500 mt-1">{item.toko}</p>
+                </div>
               </div>
-            ) : (
-              <div className="py-8 text-center text-[#63714e]/50 text-sm font-medium">
-                Belum ada riwayat pesanan
-              </div>
-            )}
+            ))}
           </div>
         </section>
       </div>
 
-      {/* MODAL LOGOUT */}
       {showLogout && (
         <LogoutModal
           onClose={() => setShowLogout(false)}
-          onLogout={() => navigate("/")}
+          onLogout={() => {
+            localStorage.removeItem("user");
+            navigate("/");
+          }}
         />
       )}
     </main>

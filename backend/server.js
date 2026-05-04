@@ -1,65 +1,64 @@
-const express = require('express');
-const cors = require('cors');
-const db = require('./db');
+const express = require("express");
+const cors = require("cors");
+const db = require("./db");
 const path = require("path");
 
 const app = express();
 
-// Middleware
+// 1. MIDDLEWARE
 app.use(cors());
 app.use(express.json());
 
+// Menjadikan folder 'uploads' bisa diakses publik (untuk gambar produk)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Test API
-app.get('/', (req, res) => {
-  res.send('API berjalan 🚀');
+// 2. IMPORT ROUTES (Disatukan agar tidak bentrok)
+const authRoutes = require("./routes/auth");
+const produkRoutes = require("./routes/produk");
+const chatRoutes = require("./routes/chat");
+const profileRoutes = require("./routes/profile");
+const notificationRoutes = require("./routes/notification");
+
+// 3. DAFTARKAN ROUTES (Menggunakan path yang rapi)
+// Sekarang semua URL akan seragam dan tidak bertabrakan
+app.use("/api/auth", authRoutes); // Contoh: /api/auth/login
+app.use("/api", authRoutes); // Alias: /api/login dan /api/register
+app.use("/api/produk", produkRoutes); // Contoh: /api/produk/ (untuk ambil data)
+app.use("/api/chat", chatRoutes); // Contoh: /api/chat/ (untuk pesan)
+app.use("/api/profile", profileRoutes);
+app.use("/api/notifikasi", notificationRoutes);
+
+app.get("/api/profile/test", (req, res) => {
+  res.json({ message: "Profile route aktif (server.js)" });
 });
 
-// Test route
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API OK' });
+// 4. TEST KONEKSI API & DATABASE
+app.get("/", (req, res) => {
+  res.send("API Food Waste berjalan 🚀");
 });
 
-// Routes 
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/productRoutes');
-const chatRoutes = require('./routes/chatRoutes');
-
-app.use('/api', authRoutes); 
-app.use('/api', productRoutes); 
-app.use('/api', chatRoutes);
-
-// Cek koneksi database
 db.connect((err) => {
   if (err) {
-    console.error('❌ Gagal konek ke database:', err);
+    console.error("❌ Gagal konek ke database MySQL:", err);
   } else {
-    console.log('✅ Berhasil konek ke MySQL');
+    console.log("✅ Berhasil konek ke MySQL (Database: foodwaste)");
   }
 });
 
-const produkRoutes = require('./routes/produk');
-app.use('/api/produk', produkRoutes);
-
-const chatRoutes = require('./routes/chat');
-app.use('/api/chat', chatRoutes);
-
-// Error handler
+// 5. ERROR HANDLER (Jika ada kesalahan di server)
 app.use((err, req, res, next) => {
-  console.error('🔥 ERROR SERVER:', err.stack);
-  res.status(500).json({ message: 'Terjadi kesalahan di server' });
+  console.error("🔥 ERROR SERVER:", err.stack);
+  res.status(500).json({ message: "Terjadi kesalahan di server" });
 });
 
-// Route tidak ditemukan
+// 6. ROUTE TIDAK DITEMUKAN
 app.use((req, res) => {
-  res.status(404).json({ message: 'Route tidak ditemukan' });
+  res.status(404).json({ message: "Alamat API tidak ditemukan" });
 });
 
-// Jalankan server
+// 7. JALANKAN SERVER
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server jalan di http://localhost:${PORT}`);
-  console.log(`📝 Register: POST http://localhost:${PORT}/api/register`);
-  console.log(`🔐 Login: POST http://localhost:${PORT}/api/login`);
+  console.log(`📝 Cek Produk: GET http://localhost:${PORT}/api/produk`);
 });
