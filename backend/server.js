@@ -37,6 +37,9 @@ db.connect((err) => {
 const produkRoutes = require('./routes/produk');
 app.use('/api/produk', produkRoutes);
 
+const chatRoutes = require('./routes/chat');
+app.use('/api/chat', chatRoutes);
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error('🔥 ERROR SERVER:', err.stack);
