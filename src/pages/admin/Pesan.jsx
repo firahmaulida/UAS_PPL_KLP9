@@ -26,55 +26,102 @@ export const PesanAdmin = () => {
   const [allConversations, setAllConversations] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3000/api/chat")
+  const admin = JSON.parse(localStorage.getItem("user"));
+  const adminId = admin?.id;
+
+  const loadChats = () => {
+    axios.get(`http://localhost:3000/api/chat/admin/${adminId}`)
       .then((res) => {
-        console.log("DATA API:", res.data);
+        setAllConversations((prev) => {
+  return res.data.data.map((item) => {
+    const existing = prev.find((c) => c.id === item.id);
 
-        const data = res.data.map((item) => ({
-          id: item.id,
-          name: item.nama || "User",
-          msg: item.last_message || "Belum ada pesan",
-          time: item.last_time
-            ? new Date(item.last_time).toLocaleTimeString()
-            : "",
-          img: chat1,
-          role: "Pembeli",
-          messages: [],
-        }));
+    return {
+      id: item.id,
+      name: item.nama_lengkap || "User",
+      msg: item.last_message || "Belum ada pesan",
+      time: item.last_time
+        ? new Date(item.last_time).toLocaleTimeString()
+        : "",
+      img: chat1,
+      role: "Pembeli",
+      messages: existing?.messages || [],
+    };
+  });
+});
 
-        console.log("SET DATA:", data);
-
-        setAllConversations(data);
       })
       .catch((err) => {
         console.error("Gagal ambil chat:", err);
       });
-  }, []);
+  };
+
+  loadChats(); // pertama kali
+
+  const interval = setInterval(() => {
+    loadChats(); // ulang tiap 2 detik
+  }, 2000);
+
+  return () => clearInterval(interval);
+}, []);
+
+useEffect(() => {
+  if (!selectedId) return;
+
+  const interval = setInterval(() => {
+    axios
+      .get(`http://localhost:3000/api/chat/user/messages/${selectedId}`)
+      .then((res) => {
+        const admin = JSON.parse(localStorage.getItem("user"));
+        const adminId = admin?.id;
+
+        const msgs = res.data.data.map((m) => ({
+          from: m.sender_id === adminId ? "me" : "them",
+          text: m.message,
+        }));
+
+        setAllConversations((prev) =>
+          prev.map((c) =>
+            c.id === selectedId
+              ? { ...c, messages: msgs }
+              : c
+          )
+        );
+      });
+  }, 2000);
+
+  return () => clearInterval(interval);
+}, [selectedId]);
 
   const activeChat = allConversations.find((c) => c.id === selectedId);
 
-  const filtered = allConversations;
+  const filtered = allConversations.filter((c) =>
+  c.name.toLowerCase().includes(searchValue.toLowerCase())
+);
 
-    const sendMessage = async () => {
-  if (!inputText.trim() || !selectedId) return;
+      const sendMessage = async () => {
+    const admin = JSON.parse(localStorage.getItem("user"));
+    const adminId = admin?.id;
 
-  try {
-    const text = inputText; // 🔥 simpan dulu
+    if (!inputText.trim() || !selectedId || !adminId) return;
 
-  await axios.post("http://localhost:3000/api/chat", {
+    try {
+      const text = inputText;
+
+  await axios.post("http://localhost:3000/api/chat/admin/send", {
     chat_id: selectedId,
-    sender_id: 16,
+    admin_id: adminId,   // ✅ FIX
     message: text,
   });
 
   setInputText("");
 
   const res = await axios.get(
-    `http://localhost:3000/api/chat/${selectedId}`
+    `http://localhost:3000/api/chat/user/messages/${selectedId}`
   );
 
-  const msgs = res.data.map((m) => ({
-    from: m.sender_id === 16 ? "me" : "them",
+  const msgs = res.data.data.map((m) => ({
+    from: m.sender_id === adminId ? "me" : "them",
     text: m.message,
   }));
 
@@ -169,11 +216,15 @@ export const PesanAdmin = () => {
                 key={c.id}
                 onClick={() => {
                       setSelectedId(c.id);
+                      setInputText("");
 
-                      axios.get(`http://localhost:3000/api/chat/${c.id}`)
+                      axios.get(`http://localhost:3000/api/chat/user/messages/${c.id}`)
                         .then((res) => {
-                          const msgs = res.data.map((m) => ({
-                            from: m.sender_id === 16 ? "me" : "them",
+                          const admin = JSON.parse(localStorage.getItem("user"));
+                          const adminId = admin?.id;
+
+                          const msgs = res.data.data.map((m) => ({
+                            from: m.sender_id === adminId ? "me" : "them",
                             text: m.message,
                           }));
 

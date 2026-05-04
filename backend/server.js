@@ -26,9 +26,11 @@ const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/productRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 
+
 app.use('/api', authRoutes); 
 app.use('/api', productRoutes); 
-app.use('/api', chatRoutes);
+app.use('/api/chat', chatRoutes);
+
 
 // Cek koneksi database
 db.connect((err) => {
@@ -42,8 +44,6 @@ db.connect((err) => {
 const produkRoutes = require('./routes/produk');
 app.use('/api/produk', produkRoutes);
 
-const chatRoutes = require('./routes/chat');
-app.use('/api/chat', chatRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SideBar from "../../components/SideBar";
 // Import Ikon dari Lucide
 import { Bell, Search, Send, Plus, MessageCircle } from "lucide-react";
@@ -10,16 +10,62 @@ import chat1 from "../../assets/chat1.png";
 
 export const PesanUser = () => {
   const [selectedId, setSelectedId] = useState(null);
+  const [chats, setChats] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [inputText, setInputText] = useState("");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user?.id;
 
-  const conversations = [
-    { id: 1, name: "Bakery Corner", msg: "Terima kasih kak <3", time: "10 m ago", img: chat1 },
-    { id: 2, name: "Donut Shop", msg: "Pesanan sedang diproses", time: "1 h ago", img: chat1 },
-    { id: 3, name: "Coffee Bean", msg: "Siap kak, ditunggu ya", time: "2 h ago", img: chat1 },
-  ];
+  const conversations = chats.map(c => ({
+  id: c.id,
+  toko_id: c.toko_id, // 🔥 TAMBAHKAN
+  name: c.nama_lengkap || "Toko",
+  msg: c.last_message,
+  time: "recent",
+  img: chat1
+}));
 
-  const activeChat = conversations.find((c) => c.id === selectedId);
+  const activeChat = selectedId;
+
+  const loadMessages = (chatId) => {
+    fetch(`http://localhost:3000/api/chat/user/messages/${chatId}`)
+      .then(res => res.json())
+      .then(data => setMessages(data.data || []));
+  };
+
+  const sendMessage = () => {
+  if (!inputText || !selectedId) return;
+
+  const chat = selectedId;
+
+  fetch("http://localhost:3000/api/chat/user/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      toko_id: selectedId.toko_id,
+      message: inputText
+    })
+  })
+    .then(res => res.json())
+    .then(() => {
+      setInputText("");
+      loadMessages(selectedId.id);
+    });
+};
+useEffect(() => {
+  if (!userId) return;
+
+  fetch(`http://localhost:3000/api/chat/user/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+      setChats(data.data || []);
+    })
+    .catch(err => console.error(err));
+}, [userId]);
 
   return (
     <main 
@@ -84,9 +130,12 @@ export const PesanUser = () => {
             {conversations.map((c) => (
               <button 
                 key={c.id} 
-                onClick={() => setSelectedId(c.id)}
+                onClick={() => {
+                  setSelectedId(c);
+                  loadMessages(c.id);
+                }}
                 className={`w-full flex items-center p-4 rounded-[2.5rem] transition-all border-2 ${
-                  selectedId === c.id ? "bg-white border-[#f8bc22] shadow-lg scale-[1.02]" : "bg-white/30 border-transparent hover:bg-white/60"
+                  selectedId?.id === c.id ? "bg-white border-[#f8bc22] shadow-lg scale-[1.02]" : "bg-white/30 border-transparent hover:bg-white/60"
                 }`}
               >
                 <img src={c.img} alt="" className="w-12 h-12 rounded-full object-cover shadow-sm border border-gray-100" />
@@ -121,23 +170,43 @@ export const PesanUser = () => {
 
               {/* Chat Content Area */}
               <div className="flex-1 p-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide">
+
+                {/* CHAT DUMMY (BIARKAN) */}
                 <div className="flex items-end gap-3">
-                  <img src={activeChat.img} alt="" className="w-8 h-8 rounded-full shadow-sm" />
-                  <div className="bg-white px-4 py-2.5 rounded-2xl rounded-bl-none shadow-sm max-w-sm border border-gray-100">
-                    <p className="text-sm text-gray-800 font-medium leading-relaxed">Halo Kak, Sisa Stok Donat Gula hari ini sisa 3 kak.</p>
-                  </div>
+                  ...
                 </div>
 
                 <div className="flex items-end gap-3 self-end">
-                  <div className="bg-[#f8bc2235] p-4 rounded-2xl rounded-br-none shadow-sm max-w-sm">
-                    <p className="text-sm text-gray-800 font-bold italic">Iya kak, ambil semua berapa totalnya?</p>
-                  </div>
-                  <img src={userProfil} alt="" className="w-8 h-8 rounded-full shadow-sm" />
+                  ...
                 </div>
 
                 <div className="ml-12 bg-[#63714e] p-4 rounded-3xl rounded-bl-none max-w-sm shadow-lg text-white font-bold">
-                   21.000 kak, kami tunggu di toko ya!
+                  21.000 kak, kami tunggu di toko ya!
                 </div>
+
+                {/* 🔥 TAMBAHAN MESSAGE DARI BACKEND */}
+                {/* 🔥 TAMBAHAN MESSAGE DARI BACKEND */}
+{messages.map((m, i) => (
+  <div key={i} className={`flex items-end gap-3 ${m.sender_id === userId ? "self-end" : ""}`}>
+    
+    {m.sender_id !== userId && (
+      <img src={activeChat.img} className="w-8 h-8 rounded-full shadow-sm" />
+    )}
+
+    <div className={`p-3 rounded-2xl max-w-sm ${
+      m.sender_id === userId
+        ? "bg-[#f8bc2235]"
+        : "bg-white border"
+    }`}>
+      <p className="text-sm text-gray-800">{m.message}</p>
+    </div>
+
+    {m.sender_id === userId && (
+      <img src={userProfil} className="w-8 h-8 rounded-full shadow-sm" />
+    )}
+  </div>
+))}
+
               </div>
 
               {/* Chat Input */}
@@ -151,11 +220,15 @@ export const PesanUser = () => {
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                   />
-                  <button className={`p-3 rounded-2xl transition-all shadow-md ${inputText ? 'bg-[#63714e] text-white' : 'bg-gray-100 text-gray-300'}`}>
+                  <button
+                    onClick={sendMessage}
+                    className={`p-3 rounded-2xl transition-all shadow-md ${inputText ? 'bg-[#63714e] text-white' : 'bg-gray-100 text-gray-300'}`}
+                  >
                     <Send size={18} />
                   </button>
                 </div>
               </div>
+
             </>
           ) : (
             /* Tampilan Default saat belum ada obrolan yang dipilih */
