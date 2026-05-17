@@ -32,29 +32,29 @@ export const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setErrorMessage("");
-    
+
     if (!role) {
       setErrorMessage("Silakan pilih role terlebih dahulu!");
       return;
     }
-    
+
     if (!email) {
       setErrorMessage("Email harus diisi!");
       return;
     }
-    
+
     if (!password) {
       setErrorMessage("Password harus diisi!");
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: email,
@@ -62,19 +62,19 @@ export const Login = () => {
           role: role,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
-        console.log('Login success:', data);
-        
+        console.log("Login success:", data);
+
         // Simpan ke storage
         const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem('token', data.token);
-        storage.setItem('userRole', data.user.role);
-        storage.setItem('userData', JSON.stringify(data.user));
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
+        storage.setItem("token", data.token);
+        storage.setItem("userRole", data.user.role);
+        storage.setItem("userData", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         // Redirect
         if (data.user.role === "admin") {
           navigate("/admin/dashboard", { replace: true });
@@ -82,11 +82,15 @@ export const Login = () => {
           navigate("/dashboarduser", { replace: true });
         }
       } else {
-        setErrorMessage(data.message || "Login gagal! Periksa email dan password Anda.");
+        setErrorMessage(
+          data.message || "Login gagal! Periksa email dan password Anda.",
+        );
       }
     } catch (error) {
-      console.error('Error:', error);
-      setErrorMessage("Tidak dapat terhubung ke server. Pastikan backend berjalan di http://localhost:3000");
+      console.error("Error:", error);
+      setErrorMessage(
+        "Tidak dapat terhubung ke server. Pastikan backend berjalan di http://localhost:3000",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -150,7 +154,11 @@ export const Login = () => {
                     onClick={() => handleRoleSelect(option.value)}
                     className="px-6 py-3 text-sm text-white cursor-pointer hover:bg-yellow-400 flex items-center gap-3"
                   >
-                    <img src={peopleImg} alt="" className="w-5 h-5 opacity-70" />
+                    <img
+                      src={peopleImg}
+                      alt=""
+                      className="w-5 h-5 opacity-70"
+                    />
                     {option.label}
                   </li>
                 ))}
@@ -184,7 +192,11 @@ export const Login = () => {
               className="flex-1 bg-transparent text-white placeholder-white text-sm outline-none"
               disabled={isLoading}
             />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} disabled={isLoading}>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={isLoading}
+            >
               <img src={eyeImg} alt="" className="w-6 h-6 opacity-80" />
             </button>
           </div>
@@ -199,13 +211,7 @@ export const Login = () => {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 disabled={isLoading}
               />
-              <label htmlFor={rememberMeId} className="text-xs text-gray-600">
-                Ingatkan saya
-              </label>
             </div>
-            <a href="#" className="text-xs text-blue-600 underline">
-              Lupa Kata Sandi
-            </a>
           </div>
 
           {/* Tombol Login */}
