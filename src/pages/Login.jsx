@@ -69,11 +69,13 @@ export const Login = () => {
         console.log("Login success:", data);
 
         // Simpan ke storage
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem("token", data.token);
-        storage.setItem("userRole", data.user.role);
-        storage.setItem("userData", JSON.stringify(data.user));
-        localStorage.setItem("user", JSON.stringify(data.user));
+        if (data.user) {
+          const storage = rememberMe ? localStorage : sessionStorage;
+          storage.setItem("token", data.token);
+          storage.setItem("userRole", data.user.role);
+          storage.setItem("userData", JSON.stringify(data.user));
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
 
         // Redirect
         if (data.user.role === "admin") {

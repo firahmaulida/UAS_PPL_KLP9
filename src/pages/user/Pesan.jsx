@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import React, { useState, useEffect } from "react";
-=======
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
->>>>>>> origin/main
 import SideBar from "../../components/SideBar";
 import NotifDropdown from "../../components/NotifDropdown";
 import { Bell, Search, Send, Plus, MessageCircle, Store } from "lucide-react";
@@ -11,6 +7,7 @@ import { Bell, Search, Send, Plus, MessageCircle, Store } from "lucide-react";
 import bgUtama from "../../assets/image.png";
 import userProfil from "../../assets/Rectangle.png";
 import chat1 from "../../assets/chat1.png";
+import NotificationBell from "../../components/NotificationBell";
 
 const API = "http://localhost:3000/api";
 
@@ -27,112 +24,47 @@ const getCurrentUserId = () => {
 };
 
 export const PesanUser = () => {
-<<<<<<< HEAD
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedChat, setSelectedChat] = useState(null);
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [inputText, setInputText] = useState("");
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user?.id;
-
-  const conversations = chats.map(c => ({
-  id: c.id,
-  toko_id: c.toko_id, // 🔥 TAMBAHKAN
-  name: c.nama_lengkap || "Toko",
-  msg: c.last_message,
-  time: "recent",
-  img: chat1
-}));
-
-  const activeChat = selectedId;
-
-  const loadMessages = (chatId) => {
-    fetch(`http://localhost:3000/api/chat/user/messages/${chatId}`)
-      .then(res => res.json())
-      .then(data => setMessages(data.data || []));
-  };
-
-  const sendMessage = () => {
-  if (!inputText || !selectedId) return;
-
-  const chat = selectedId;
-
-  fetch("http://localhost:3000/api/chat/user/send", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      user_id: userId,
-      toko_id: selectedId.toko_id,
-      message: inputText
-    })
-  })
-    .then(res => res.json())
-    .then(() => {
-      setInputText("");
-      loadMessages(selectedId.id);
-    });
-};
-useEffect(() => {
-  if (!userId) return;
-
-  fetch(`http://localhost:3000/api/chat/user/${userId}`)
-    .then(res => res.json())
-    .then(data => {
-      setChats(data.data || []);
-    })
-    .catch(err => console.error(err));
-}, [userId]);
-=======
+  const [loading, setLoading] = useState(false);
+  
   const location = useLocation();
   const navigate = useNavigate();
   const messagesEndRef = useRef(null);
-  const notifRef = useRef(null);
-
-  const [selectedChatId, setSelectedChatId] = useState(null);
-  const [searchValue, setSearchValue] = useState("");
-  const [inputText, setInputText] = useState("");
-  const [conversations, setConversations] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [showNotif, setShowNotif] = useState(false);
-
+  
   const userId = getCurrentUserId();
 
   const fetchRooms = async () => {
     if (!userId) return;
-
     try {
-      const res = await fetch(`${API}/chat?user_id=${userId}`);
-      const data = await res.json();
+      const res = await fetch(`${API}/chat/user/${userId}`);
+      const result = await res.json();
+      const data = result.data || [];
 
       const rooms = Array.isArray(data)
         ? data.map((item) => ({
             id: item.id,
             user_id: item.user_id,
             toko_id: item.toko_id,
-            name: item.nama_toko || "Toko",
+            name: item.nama_lengkap || item.nama_toko || "Toko",
             msg: item.last_message || "Belum ada pesan",
             time: item.last_time
               ? new Date(item.last_time).toLocaleTimeString("id-ID", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })
-              : "",
+              : "recent",
             img: item.toko_foto
               ? `http://localhost:3000/uploads/${item.toko_foto}`
               : chat1,
+            unread_count: item.unread_count || 0
           }))
         : [];
 
-      setConversations(rooms);
-
-      if (!selectedChatId && rooms.length > 0) {
-        setSelectedChatId(rooms[0].id);
-      }
+      setChats(rooms);
     } catch (err) {
       console.error(err);
     }
@@ -146,23 +78,20 @@ useEffect(() => {
 
   const fetchMessages = async (chatId) => {
     try {
-      const res = await fetch(`${API}/chat/${chatId}`);
-      const data = await res.json();
+      const res = await fetch(`${API}/chat/user/messages/${chatId}`);
+      const result = await res.json();
+      const newMessages = result.data || [];
+      setMessages(newMessages);
 
-      const mapped = Array.isArray(data)
-        ? data.map((m) => ({
-            from: m.sender_id === userId ? "me" : "them",
-            text: m.message,
-            time: m.created_at
-              ? new Date(m.created_at).toLocaleTimeString("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "",
-          }))
-        : [];
-
-      setMessages(mapped);
+      // Cek apakah ada pesan dari lawan yang belum dibaca
+      const hasUnread = newMessages.some(m => Number(m.sender_id) !== Number(userId) && !m.is_read);
+      if (hasUnread) {
+        fetch(`${API}/chat/read/${chatId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId })
+        }).catch(console.error);
+      }
 
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -173,35 +102,43 @@ useEffect(() => {
   };
 
   useEffect(() => {
-    if (!selectedChatId) return;
+    if (!selectedChat) return;
 
-    fetchMessages(selectedChatId);
-    const interval = setInterval(() => fetchMessages(selectedChatId), 1500);
+    fetchMessages(selectedChat.id);
+    const interval = setInterval(() => fetchMessages(selectedChat.id), 1500);
     return () => clearInterval(interval);
-  }, [selectedChatId]);
+  }, [selectedChat, userId]);
 
+  // Handle redirect dari halaman lain untuk membuat chat baru
   useEffect(() => {
     if (!location.state?.id_toko || !userId) return;
 
     const { id_toko, nama_produk } = location.state;
 
+    // Bersihkan state agar tidak dikirim ulang saat re-render atau refresh
+    navigate(location.pathname, { replace: true, state: {} });
+
     const createRoom = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API}/chat/get-or-create`, {
+        const text = `Halo, apakah menu "${nama_produk}" masih tersedia?`;
+        const res = await fetch(`${API}/chat/user/send`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             user_id: userId,
             toko_id: id_toko,
+            message: text,
           }),
         });
 
         const result = await res.json();
         await fetchRooms();
-        setSelectedChatId(result.chat_id);
-        setInputText(`Halo, apakah menu \"${nama_produk}\" masih tersedia?`);
-        fetchMessages(result.chat_id);
+        
+        if (result.success && result.chat_id) {
+           setSelectedChat({ id: result.chat_id, toko_id: id_toko, name: "Toko" });
+        }
+
       } catch (err) {
         console.error(err);
       } finally {
@@ -212,50 +149,34 @@ useEffect(() => {
     createRoom();
   }, [location.state, userId]);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setShowNotif(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+  
   const sendMessage = async () => {
-    const text = inputText.trim();
-    if (!text || !selectedChatId || sending) return;
+    if (!inputText.trim() || !selectedChat) return;
 
-    setSending(true);
+    const text = inputText.trim();
     setInputText("");
 
     try {
-      await fetch(`${API}/chat`, {
+      await fetch(`${API}/chat/user/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          chat_id: selectedChatId,
-          sender_id: userId,
+          user_id: userId,
+          toko_id: selectedChat.toko_id,
           message: text,
         }),
       });
 
-      fetchMessages(selectedChatId);
+      fetchMessages(selectedChat.id);
       fetchRooms();
     } catch (err) {
       console.error(err);
-    } finally {
-      setSending(false);
     }
   };
 
-  const activeChat = conversations.find((c) => c.id === selectedChatId);
-
-  const filteredConversations = conversations.filter((c) =>
+  const filteredChats = chats.filter((c) =>
     c.name.toLowerCase().includes(searchValue.toLowerCase()),
   );
->>>>>>> origin/main
 
   return (
     <main className="relative w-screen h-screen bg-[#effae8] overflow-hidden font-sans">
@@ -281,15 +202,7 @@ useEffect(() => {
       </header>
 
       <div className="absolute top-6 right-12 flex items-center gap-5 z-30">
-        <div className="relative" ref={notifRef}>
-          <button
-            onClick={() => setShowNotif(!showNotif)}
-            className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg text-[#63714e]"
-          >
-            <Bell size={22} />
-          </button>
-          {showNotif && <NotifDropdown />}
-        </div>
+        <NotificationBell />
         <img
           src={userProfil}
           alt=""
@@ -316,31 +229,17 @@ useEffect(() => {
             </div>
           </div>
 
-<<<<<<< HEAD
           <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-3 scrollbar-hide">
-            {conversations.map((c) => (
-              <button 
-                key={c.id} 
-                onClick={() => {
-                  setSelectedId(c);
-                  loadMessages(c.id);
-                }}
-                className={`w-full flex items-center p-4 rounded-[2.5rem] transition-all border-2 ${
-                  selectedId?.id === c.id ? "bg-white border-[#f8bc22] shadow-lg scale-[1.02]" : "bg-white/30 border-transparent hover:bg-white/60"
-                }`}
-=======
-          <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-2">
             {loading && (
               <p className="text-center text-xs text-gray-400 py-6">
                 Menghubungkan ke toko...
               </p>
             )}
-            {filteredConversations.map((c) => (
+            {filteredChats.map((c) => (
               <button
                 key={c.id}
-                onClick={() => setSelectedChatId(c.id)}
-                className={`w-full flex items-center gap-3 p-3 rounded-3xl ${selectedChatId === c.id ? "bg-white border-2 border-[#f8bc22]" : "bg-white/40 hover:bg-white"}`}
->>>>>>> origin/main
+                onClick={() => setSelectedChat(c)}
+                className={`w-full flex items-center gap-3 p-4 rounded-[2.5rem] transition-all border-2 ${selectedChat?.id === c.id ? "bg-white border-[#f8bc22] shadow-lg scale-[1.02]" : "bg-white/30 border-transparent hover:bg-white/60"}`}
               >
                 <img src={c.img} alt="" className="w-11 h-11 rounded-full" />
                 <div className="flex-1 min-w-0 text-left">
@@ -348,7 +247,14 @@ useEffect(() => {
                     <h4 className="font-black text-sm text-[#63714e] truncate">
                       {c.name}
                     </h4>
-                    <span className="text-[10px] text-gray-400">{c.time}</span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-[10px] text-gray-400">{c.time}</span>
+                      {c.unread_count > 0 && selectedChat?.id !== c.id && (
+                         <span className="bg-[#f8bc22] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                           {c.unread_count}
+                         </span>
+                      )}
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500 truncate">{c.msg}</p>
                 </div>
@@ -358,7 +264,7 @@ useEffect(() => {
         </section>
 
         <section className="flex-1 bg-white/80 rounded-3xl shadow-2xl flex flex-col overflow-hidden">
-          {activeChat ? (
+          {selectedChat ? (
             <>
               <div className="px-8 py-5 border-b bg-white/60 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-[#f8bc22] flex items-center justify-center text-white">
@@ -366,7 +272,7 @@ useEffect(() => {
                 </div>
                 <div>
                   <h3 className="font-black text-[#63714e]">
-                    {activeChat.name}
+                    {selectedChat.name}
                   </h3>
                   <p className="text-xs text-green-600 font-bold">
                     Merchant sedang aktif
@@ -374,62 +280,34 @@ useEffect(() => {
                 </div>
               </div>
 
-<<<<<<< HEAD
-              {/* Chat Content Area */}
               <div className="flex-1 p-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide">
+                {messages.map((m, i) => {
+                  const isMe = Number(m.sender_id) === Number(userId);
+                  return (
+                    <div key={i} className={`flex items-end gap-3 w-full ${isMe ? "flex-row-reverse" : "flex-row"}`}>
+                      <img 
+                        src={isMe ? userProfil : (selectedChat.img || chat1)} 
+                        className="w-8 h-8 rounded-full shadow-sm object-cover" 
+                      />
 
-                {/* CHAT DUMMY (BIARKAN) */}
-                <div className="flex items-end gap-3">
-                  ...
-                </div>
-
-                <div className="flex items-end gap-3 self-end">
-                  ...
-                </div>
-
-                <div className="ml-12 bg-[#63714e] p-4 rounded-3xl rounded-bl-none max-w-sm shadow-lg text-white font-bold">
-                  21.000 kak, kami tunggu di toko ya!
-                </div>
-
-                {/* 🔥 TAMBAHAN MESSAGE DARI BACKEND */}
-                {/* 🔥 TAMBAHAN MESSAGE DARI BACKEND */}
-{messages.map((m, i) => (
-  <div key={i} className={`flex items-end gap-3 ${m.sender_id === userId ? "self-end" : ""}`}>
-    
-    {m.sender_id !== userId && (
-      <img src={activeChat.img} className="w-8 h-8 rounded-full shadow-sm" />
-    )}
-
-    <div className={`p-3 rounded-2xl max-w-sm ${
-      m.sender_id === userId
-        ? "bg-[#f8bc2235]"
-        : "bg-white border"
-    }`}>
-      <p className="text-sm text-gray-800">{m.message}</p>
-    </div>
-
-    {m.sender_id === userId && (
-      <img src={userProfil} className="w-8 h-8 rounded-full shadow-sm" />
-    )}
-  </div>
-))}
-
-=======
-              <div className="flex-1 px-8 py-6 overflow-y-auto flex flex-col gap-4">
-                {messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex ${msg.from === "me" ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`px-5 py-3 rounded-3xl max-w-md text-sm shadow ${msg.from === "me" ? "bg-[#63714e] text-white" : "bg-white"}`}
-                    >
-                      {msg.text}
+                      <div className={`p-3 rounded-2xl max-w-[75%] shadow-sm ${
+                        isMe
+                          ? "bg-[#dcf8c6] text-gray-800 rounded-br-none" 
+                          : "bg-white border text-gray-800 rounded-bl-none"
+                      }`}>
+                        <p className="text-sm">{m.message}</p>
+                        {isMe && (
+                          <div className="flex justify-end mt-1">
+                            <span className={`text-[10px] ${m.is_read ? "text-blue-500" : "text-gray-400"}`}>
+                              {m.is_read ? "✓✓" : "✓"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 <div ref={messagesEndRef}></div>
->>>>>>> origin/main
               </div>
 
               <div className="p-5 border-t bg-white/50">
@@ -444,20 +322,13 @@ useEffect(() => {
                   />
                   <button
                     onClick={sendMessage}
-<<<<<<< HEAD
-                    className={`p-3 rounded-2xl transition-all shadow-md ${inputText ? 'bg-[#63714e] text-white' : 'bg-gray-100 text-gray-300'}`}
+                    disabled={!inputText.trim()}
+                    className={`p-3 rounded-2xl transition-all shadow-md ${inputText.trim() ? 'bg-[#63714e] text-white' : 'bg-gray-100 text-gray-300'}`}
                   >
                     <Send size={18} />
-=======
-                    disabled={!inputText.trim() || sending}
-                    className="bg-[#63714e] text-white p-2.5 rounded-xl"
-                  >
-                    <Send size={16} />
->>>>>>> origin/main
                   </button>
                 </div>
               </div>
-
             </>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 text-gray-400">

@@ -17,6 +17,7 @@ import {
 
 import bgUtama from "../../assets/image.png";
 import userProfil from "../../assets/Rectangle.png";
+import NotificationBell from "../../components/NotificationBell";
 
 const PengaturanAdmin = () => {
   const navigate = useNavigate();
@@ -70,9 +71,7 @@ const PengaturanAdmin = () => {
       </header>
 
       <div className="absolute top-6 right-12 flex items-center gap-6 z-30">
-        <button className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center text-[#63714e] shadow-lg">
-          <Bell size={24} />
-        </button>
+        <NotificationBell />
         <img
           src={
             currentUser?.foto

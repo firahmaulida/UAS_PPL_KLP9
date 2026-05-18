@@ -20,6 +20,7 @@ import bolu from "../../assets/bolu.jpg";
 import brownies from "../../assets/brownies.jpg";
 import cake from "../../assets/cake.jpg";
 import cheescake from "../../assets/cheescake.jpg";
+import NotificationBell from "../../components/NotificationBell";
 
 const API = "http://localhost:3000/api";
 
@@ -346,9 +347,7 @@ const ListMenuAdmin = () => {
       </header>
 
       <div className="absolute top-6 right-12 flex items-center gap-4 z-30">
-        <button className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg">
-          <Bell size={20} className="text-[#63714e]" />
-        </button>
+        <NotificationBell />
         <div className="bg-white rounded-full px-3 py-1 flex items-center gap-3 shadow-md">
           <img
             src={

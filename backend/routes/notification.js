@@ -25,11 +25,50 @@ router.get("/:user_id", (req, res) => {
   db.query(
     "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC",
     [user_id],
-    (err, result) => {
+    (err, notifResult) => {
       if (err) {
         return res.status(500).json({ message: "Gagal ambil notif" });
       }
-      res.json(result);
+
+      // Cek apakah user ini adalah admin/toko yang punya produk expired <= 3 hari
+      db.query(
+        "SELECT id_produk, nama_produk, expired_date FROM produk WHERE id_toko = ? AND DATEDIFF(expired_date, NOW()) <= 3 AND DATEDIFF(expired_date, NOW()) >= -30 ORDER BY expired_date ASC",
+        [user_id],
+        (err, produkResult) => {
+          if (err) return res.json(notifResult);
+
+          const dynamicNotifs = produkResult.map(p => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const exp = new Date(p.expired_date);
+            exp.setHours(0, 0, 0, 0);
+            const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+            
+            let title = "Peringatan Stok Expired";
+            let msg = `Produk "${p.nama_produk}" akan expired dalam ${diffDays} hari!`;
+            
+            if (diffDays < 0) {
+               title = "Produk Kadaluarsa";
+               msg = `Produk "${p.nama_produk}" telah kadaluarsa! Segera hapus atau perbarui.`;
+            } else if (diffDays === 0) {
+               title = "Produk Expired Hari Ini";
+               msg = `Produk "${p.nama_produk}" expired hari ini!`;
+            }
+
+            return {
+              id: "dyn_" + p.id_produk,
+              user_id: user_id,
+              title: title,
+              message: msg,
+              is_read: 0,
+              created_at: new Date().toISOString(),
+              type: "stock"
+            };
+          });
+
+          res.json([...dynamicNotifs, ...notifResult]);
+        }
+      );
     },
   );
 });

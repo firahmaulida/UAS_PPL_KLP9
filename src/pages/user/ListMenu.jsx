@@ -7,16 +7,15 @@ import NotifDropdown from "../../components/NotifDropdown";
 
 import bgUtama from "../../assets/image.png";
 import userProfil from "../../assets/Rectangle.png";
+import NotificationBell from "../../components/NotificationBell";
 
 const ListMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const notifRef = useRef(null);
-
+  
   const [search, setSearch] = useState("");
   const [selectedMenu, setSelectedMenu] = useState(null);
-  const [showNotif, setShowNotif] = useState(false);
-  const [menus, setMenus] = useState([]);
+    const [menus, setMenus] = useState([]);
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const focusToko = location.state?.focus_toko || null;
@@ -35,17 +34,7 @@ const ListMenu = () => {
     fetchProduk();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setShowNotif(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+  
   const handlePesanKlik = (item) => {
     if (!currentUser?.id) {
       alert("Silakan login terlebih dahulu untuk mengirim pesan.");
@@ -108,15 +97,7 @@ const ListMenu = () => {
       </header>
 
       <div className="absolute top-6 right-12 flex items-center gap-6 z-30">
-        <div className="relative" ref={notifRef}>
-          <button
-            onClick={() => setShowNotif(!showNotif)}
-            className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg text-[#63714e] hover:scale-110 transition-all"
-          >
-            <Bell size={24} />
-          </button>
-          {showNotif && <NotifDropdown />}
-        </div>
+        <NotificationBell />
 
         <img
           src={userProfil}

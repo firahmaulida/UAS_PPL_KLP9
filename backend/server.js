@@ -43,6 +43,121 @@ db.connect((err) => {
     console.error("❌ Gagal konek ke database MySQL:", err);
   } else {
     console.log("✅ Berhasil konek ke MySQL (Database: foodwaste)");
+    
+    // SETUP TABEL OTOMATIS
+    const createTablesQuery = `
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        role VARCHAR(50) NOT NULL,
+        nama_lengkap VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        no_telp VARCHAR(20),
+        nama_toko VARCHAR(255),
+        foto VARCHAR(255),
+        alamat TEXT,
+        bio TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      
+      CREATE TABLE IF NOT EXISTS produk (
+        id_produk INT AUTO_INCREMENT PRIMARY KEY,
+        nama_produk VARCHAR(255) NOT NULL,
+        harga INT NOT NULL,
+        deskripsi TEXT,
+        id_toko INT NOT NULL,
+        image VARCHAR(255),
+        created_at DATE,
+        expired_date DATE,
+        harga_diskon INT
+      );
+      
+      CREATE TABLE IF NOT EXISTS chat_rooms (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        toko_id INT NOT NULL,
+        user_id INT NOT NULL,
+        last_message TEXT,
+        last_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      
+      CREATE TABLE IF NOT EXISTS messages (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        chat_id INT NOT NULL,
+        sender_id INT NOT NULL,
+        message TEXT NOT NULL,
+        is_read BOOLEAN DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (chat_id) REFERENCES chat_rooms(id) ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        is_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Execute multiple statements (Requires multipleStatements: true in db.js)
+    // Since we don't know if multipleStatements is true, we will execute them sequentially.
+    const queries = [
+      `CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        role VARCHAR(50) NOT NULL,
+        nama_lengkap VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        no_telp VARCHAR(20),
+        nama_toko VARCHAR(255),
+        foto VARCHAR(255),
+        alamat TEXT,
+        bio TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS produk (
+        id_produk INT AUTO_INCREMENT PRIMARY KEY,
+        nama_produk VARCHAR(255) NOT NULL,
+        harga INT NOT NULL,
+        deskripsi TEXT,
+        id_toko INT NOT NULL,
+        image VARCHAR(255),
+        created_at DATE,
+        expired_date DATE,
+        harga_diskon INT
+      )`,
+      `CREATE TABLE IF NOT EXISTS chat_rooms (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        toko_id INT NOT NULL,
+        user_id INT NOT NULL,
+        last_message TEXT,
+        last_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS messages (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        chat_id INT NOT NULL,
+        sender_id INT NOT NULL,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        is_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`
+    ];
+
+    queries.forEach(q => {
+      db.query(q, (err) => {
+        if (err) console.error("Error creating table:", err.message);
+      });
+    });
   }
 });
 

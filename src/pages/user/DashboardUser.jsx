@@ -18,21 +18,26 @@ import userProfil from "../../assets/Rectangle.png"; // Foto default
 import kiri from "../../assets/kiri.png";
 import kanan from "../../assets/kanan.png";
 import food2 from "../../assets/chat2.png";
+import NotificationBell from "../../components/NotificationBell";
 
 export const DashboardUser = () => {
   const navigate = useNavigate();
-  const notifRef = useRef(null);
-
+  
   const [search, setSearch] = useState("");
-  const [showNotif, setShowNotif] = useState(false);
-  const [showStore, setShowStore] = useState(false);
+    const [showStore, setShowStore] = useState(false);
   const [selectedStore, setSelectedStore] = useState(null);
   const [menus, setMenus] = useState([]);
 
-  // Ambil data user dari localStorage
-  const currentUser = JSON.parse(
-    localStorage.getItem("user") || localStorage.getItem("userData") || "{}",
-  );
+  // Ambil data user dari localStorage dengan aman
+  let currentUser = {};
+  try {
+    const userStr = localStorage.getItem("user");
+    const userDataStr = localStorage.getItem("userData");
+    if (userStr && userStr !== "undefined") currentUser = JSON.parse(userStr);
+    else if (userDataStr && userDataStr !== "undefined") currentUser = JSON.parse(userDataStr);
+  } catch (e) {
+    console.error("Gagal parse localStorage:", e);
+  }
 
   // Logika untuk menentukan sumber foto profil
   const userPhoto = currentUser?.foto
@@ -60,7 +65,12 @@ export const DashboardUser = () => {
       try {
         const response = await fetch("http://localhost:3000/api/produk");
         const data = await response.json();
-        setMenus(data);
+        if (Array.isArray(data)) {
+          setMenus(data);
+        } else {
+          console.error("API /produk tidak mengembalikan array:", data);
+          setMenus([]);
+        }
       } catch (error) {
         console.error("Gagal mengambil data produk:", error);
       }
@@ -69,17 +79,7 @@ export const DashboardUser = () => {
     fetchProduk();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setShowNotif(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+  
   const getStatus = (expiredDate) => {
     if (!expiredDate) return "Fresh Rescue";
     const now = new Date();
@@ -122,18 +122,7 @@ export const DashboardUser = () => {
       </header>
 
       <div className="absolute top-6 right-12 flex items-center gap-6 z-30">
-        <div className="relative" ref={notifRef}>
-          <button
-            onClick={() => setShowNotif(!showNotif)}
-            className="relative w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center shadow-lg text-[#63714e]"
-          >
-            <Bell size={24} />
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">
-              3
-            </span>
-          </button>
-          {showNotif && <NotifDropdown />}
-        </div>
+        <NotificationBell />
 
         {/* FOTO PROFIL DINAMIS */}
         <img

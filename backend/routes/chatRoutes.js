@@ -23,7 +23,10 @@ router.get('/user/:user_id', chatController.getChatByUser);
 router.get('/user/messages/:chat_id', chatController.getMessagesByChatId);
 router.post('/admin/send', chatController.sendMessageAdmin);
 
-// 🔥 TAMBAHKAN INI
-router.get('/admin/:toko_id', chatController.getChatByAdmin);
+// Ambil riwayat chat berdasarkan admin
+router.get("/admin/:toko_id", chatController.getChatByAdmin);
+
+// Tandai pesan sebagai telah dibaca
+router.put("/read/:chat_id", chatController.markMessagesAsRead);
 
 module.exports = router;

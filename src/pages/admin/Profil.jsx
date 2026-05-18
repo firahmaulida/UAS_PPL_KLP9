@@ -15,6 +15,7 @@ import {
 import bgUtama from "../../assets/image.png";
 import userProfil from "../../assets/Rectangle.png";
 import food1 from "../../assets/image.png";
+import NotificationBell from "../../components/NotificationBell";
 
 const adminLogs = [
   {
@@ -118,9 +119,7 @@ export const ProfilAdmin = () => {
       </header>
 
       <div className="absolute top-6 right-12 flex items-center gap-4 z-30">
-        <button className="w-11 h-11 bg-[#f8bc22] rounded-full flex items-center justify-center text-[#63714e]">
-          <Bell size={24} />
-        </button>
+        <NotificationBell />
         <div className="p-0.5 bg-white rounded-full shadow-lg flex items-center gap-2 pr-3">
           <img
             src={
